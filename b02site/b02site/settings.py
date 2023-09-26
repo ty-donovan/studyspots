@@ -25,6 +25,7 @@ SECRET_KEY = "django-insecure-qe)d5h@$dla1!=cth883lepvnc_z1%94g!u3qk4@wxj&imy$@@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# add heroku hosting url here
 ALLOWED_HOSTS = []
 
 
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "bootstrap5",
+    "studyspots.apps.StudyspotsConfig",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +57,7 @@ ROOT_URLCONF = "b02site.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
