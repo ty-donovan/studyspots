@@ -6,3 +6,6 @@ def index(request):
 
 def map(request):
     return render(request, 'studyspots/map.html')
+
+def login(request):
+    return render(request, 'studyspots/login.html')
