@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 def index(request):
@@ -6,6 +6,3 @@ def index(request):
 
 def map(request):
     return render(request, 'studyspots/map.html')
-
-def login(request):
-    return render(request, 'studyspots/login.html')
