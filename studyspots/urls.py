@@ -8,4 +8,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("map/", views.map, name="map"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("profile/", views.profile, name="profile"),
+    path("login/", views.profile, name="welcome"),
 ]
