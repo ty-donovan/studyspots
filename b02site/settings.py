@@ -166,5 +166,3 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
     }
 }
-
-SITE_ID = 1
