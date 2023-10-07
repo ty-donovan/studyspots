@@ -1,1 +1,1 @@
-web: gunicorn b02site.wsgi
+web: gunicorn b02site.wsgi  --log-level=info --log-file -
