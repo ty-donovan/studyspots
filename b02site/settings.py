@@ -38,8 +38,6 @@ else:
 
 # Application definition
 
-SITE_ID = 2
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -152,7 +150,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -160,9 +158,14 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.environ['GOOGLE_CLIENT_ID'],
             'secret': os.environ['GOOGLE_SECRET'],
         },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
         'AUTH_PARAMS': {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
     }
 }
+SITE_ID = 1
