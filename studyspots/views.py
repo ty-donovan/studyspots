@@ -10,11 +10,11 @@ def profile(request):
     else:
         return render(request, 'studyspots/welcome/user.html', {'username': request.user.username})
 
-@login_required
+
 def index(request):
     return render(request, 'studyspots/index.html')
 
 
-@login_required()
+
 def map(request):
     return render(request, 'studyspots/map.html')
