@@ -169,6 +169,3 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 SITE_ID = 1
-
-AUTH_USER_MODEL = 'studyspots.CustomUser'
-

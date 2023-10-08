@@ -10,13 +10,7 @@
                 <h2>Home Page</h2>
                 {% load socialaccount %}
                 {% if user.is_authenticated %}
-                    {% if user.is_staff%}
-                        <p> Welcome admin, you are logged in as {{ user.email }}</p>
-                    {% else %}
-                        <p> Welcome user, you are logged in as {{ user.email }}</p>
-                    {% endif %}
-                {% else %}
-                    <p>You are not logged in. <a href="{% url 'login' %}">Login here</a>.</p>
+                    <p>Welcome user, you are logged in as {{ user.email }}</p>
                 {% endif %}
             </ul>
         </div>
