@@ -1,3 +1,5 @@
+setvars.bat
+
 # Django #
 *.log
 *.pot

@@ -155,8 +155,8 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': os.environ['GOOGLE_CLIENT_ID'],
-            'secret': os.environ['GOOGLE_SECRET'],
+            'client_id': "",
+            'secret': "",
         },
         'SCOPE': [
             'profile',
@@ -168,4 +168,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
     }
 }
+
+SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id'] = os.environ['GOOGLE_CLIENT_ID']
+SOCIALACCOUNT_PROVIDERS['google']['APP']['secret'] = os.environ['GOOGLE_SECRET']
+
 SITE_ID = 1
+
+# AUTH_USER_MODEL = 'studyspots.CustomUser'
+

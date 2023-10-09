@@ -1,0 +1,1 @@
+.\venv\Scripts\activate.bat && .\setvars.bat && .\run.bat
