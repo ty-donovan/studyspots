@@ -5,3 +5,4 @@ django-bootstrap-v5
 gunicorn
 psycopg2
 whitenoise
+googlemaps

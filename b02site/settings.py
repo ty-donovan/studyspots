@@ -172,6 +172,8 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id'] = os.environ['GOOGLE_CLIENT_ID']
 SOCIALACCOUNT_PROVIDERS['google']['APP']['secret'] = os.environ['GOOGLE_SECRET']
 
+SOCIALACCOUNT_LOGIN_ON_GET=True
+
 SITE_ID = 1
 
 # AUTH_USER_MODEL = 'studyspots.CustomUser'
