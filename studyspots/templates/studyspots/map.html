@@ -2,15 +2,36 @@
 
 {% block content %}
 {% load static %}
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+<script>
+    let map 
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"),{
+            center:{lat: 38.0356, lng: -78.5034},
+            zoom: 16,
+        }
+        );
+    }
+
+    window.initMap = initMap
+</script>
+
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <!-- <div class="col-md-6"> -->
             <ul class="list-group mt-n5">
-                <h2>Map</h2>
+                <div class="mapholder">
+                    <div id="map"></div>
+                    <script async
+                        src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap">
+                    </script>
+                </div>
             </ul>
-        </div>
+        <!-- </div> -->
     </div>
 </div>
 {% endblock %}
