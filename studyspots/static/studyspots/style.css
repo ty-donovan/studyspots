@@ -13,3 +13,12 @@ nav {
 .footer-div p {
     color: white;
 }
+
+.mapholder {
+    height: 700px;
+    width: 100%;
+}
+
+#map {
+    height: 100%
+}
