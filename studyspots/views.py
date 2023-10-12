@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 
 @login_required
@@ -33,4 +34,8 @@ def index(request):
 
 
 def map(request):
-    return render(request, 'studyspots/map.html')
+    key = settings.GOOGLE_API_KEY
+    context = {
+        'key':key,
+    }
+    return render(request, 'studyspots/map.html', context)

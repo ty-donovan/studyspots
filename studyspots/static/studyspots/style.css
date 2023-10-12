@@ -14,6 +14,16 @@ nav {
     color: white;
 }
 
+.mapholder {
+    height: 700px;
+    width: 100%;
+}
+
+#map {
+    height: 100%
+}
+
+
 .home-text {
     font-size: 1rem;
 }
