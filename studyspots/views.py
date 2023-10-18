@@ -39,3 +39,11 @@ def map(request):
         'key': key, 'locations': []
     }
     return render(request, 'studyspots/map.html', context)
+
+
+def get_location_data(request):
+    pass
+
+
+def get_spot_data(request):
+    pass
