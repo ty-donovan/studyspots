@@ -2,11 +2,15 @@
 
 {% block content %}
 {% load static %}
-
-<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-<script src="{% static 'studyspots/map/map_script.js' %}"></script>
-
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
+<script
+        src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script>
+    const icon = "{% static "studyspots/map/img/add-studyspot.svg" %}"
+    //const locations = [];
+</script>
+<script src="{% static 'studyspots/map/js/map_script.js' %}"></script>
+
 
 <div class="container-fluid">
     <div class="row">
@@ -18,7 +22,7 @@
         <div class="col-md-8 col-12">
             <div class="mapholder">
                 <div id="map"></div>
-                <script async src="https://maps.googleapis.com/maps/api/js?key={{key}}&callback=initMap">
+                <script async defer src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=core,maps,marker&callback=initMap">
                 </script>
             </div>
         </div>

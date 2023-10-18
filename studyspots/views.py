@@ -36,6 +36,6 @@ def index(request):
 def map(request):
     key = settings.GOOGLE_API_KEY
     context = {
-        'key': key,
+        'key': key, 'locations': []
     }
     return render(request, 'studyspots/map.html', context)
