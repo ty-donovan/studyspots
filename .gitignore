@@ -1,4 +1,5 @@
 setvars.bat
+secret.py
 
 # Django #
 *.log

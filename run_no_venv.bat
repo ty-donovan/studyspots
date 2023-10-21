@@ -1,1 +1,0 @@
-.\setvars.bat && .\run_django.bat
