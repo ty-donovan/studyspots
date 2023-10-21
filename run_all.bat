@@ -1,1 +1,0 @@
-.\venv\Scripts\activate.bat && .\setvars.bat && .\run_django.bat
