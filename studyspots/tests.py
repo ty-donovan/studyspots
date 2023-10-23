@@ -34,17 +34,3 @@ class MapViewTests(TestCase):
         self.assertEqual(response.context['key'], settings.GOOGLE_API_KEY)
 
 
-
-    def test_logout(self):
-        response = self.client.get(reverse('studyspots:logout'))
-        self.assertRedirects(response, '/')
-
-
-class MapViewTests(TestCase):
-    def test_load_map(self):
-        response = self.client.get(reverse('studyspots:map'))
-        self.assertTemplateUsed(response, 'studyspots/map.html')
-        self.assertEqual(response.context['key'], settings.GOOGLE_API_KEY)
-
-
-
