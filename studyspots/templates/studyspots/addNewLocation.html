@@ -2,4 +2,94 @@
 
 {% block content %}
 {% load static %}
+
+
+<link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
+
+<body>
+    <div class="container mt-5">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+            </div>
+            <div class="mb-3">
+                {{ form.location_type.label_tag }}
+                {{ form.location_type }}
+            </div>
+            <div class="mb-3">
+                {{ form.on_grounds.label_tag }}
+                {{ form.on_grounds }}
+            </div>
+            <div class="mb-3">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+            </div>
+            <div class="mb-3">
+                {{ form.overall_rating.label_tag }}
+                {{ form.overall_rating }}
+            </div>
+            <div class="mb-3">
+                {{ form.comfort_rating.label_tag }}
+                {{ form.comfort_rating }}
+            </div>
+            <div class="mb-3">
+                {{ form.noise_level_rating.label_tag }}
+                {{ form.noise_level_rating }}
+            </div>
+            <div class="mb-3">
+                {{ form.crowdedness_rating.label_tag }}
+                {{ form.crowdedness_rating }}
+            </div>
+            <div class="mb-3">
+                {{ form.lat }}
+            </div>
+            <div class="mb-3">
+                {{ form.lng }}
+            </div>
+            <div id="map" style="width: 100%; height: 400px;"></div>
+            <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
+            <input type="submit" class="btn btn-primary mt-3" value="Submit Location">
+            {% if error_message %}
+                <p class="text-danger mt-3">{{ error_message }}</p>
+            {% endif %}
+        </form>
+    </div>
+
+    <script>
+        var map;
+        var marker;
+
+        function initMap() {
+            var initialLocation = { lat: 38.0356, lng: -78.5034 }; // Default initial location (University of Virginia)
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: initialLocation,
+                zoom: 15
+            });
+
+            // Create a draggable marker
+            marker = new google.maps.Marker({
+                position: initialLocation,
+                map: map,
+                draggable: true
+            });
+
+            // Add an event listener to update the coordinates fields when the marker is dragged
+            google.maps.event.addListener(marker, 'dragend', function () {
+                var coordinates = marker.getPosition();
+                document.getElementById("id_lat").value = coordinates.lat();
+                document.getElementById("id_lng").value = coordinates.lng();
+            });
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+
+    <!-- Add your Google Maps API script tag here -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"></script>
+
+</body>
+
+
 {% endblock %}

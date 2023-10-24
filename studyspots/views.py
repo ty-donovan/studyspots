@@ -84,3 +84,55 @@ def get_spot_data(request, location_id):
         location = Location.objects.get(location_id=location_id)
         study_spot = StudySpotSerializer(location.studyspot_set.all(), many=True).data
     return JsonResponse(study_spot, safe=False)
+
+
+# views.py
+import geopy.distance
+from .forms import LocationForm
+from .models import Location
+
+# Coordinates for the University of Virginia
+uva_coordinates = (38.0356, -78.5034)
+
+def submit_location(request):
+    error_message = None
+
+    if request.method == 'POST':
+        form = LocationForm(request.POST)
+        if form.is_valid():
+            # Get the coordinates from the form
+            lat = form.cleaned_data['lat']
+            lng = form.cleaned_data['lng']
+
+            # Check if the location is within a 10-mile radius of the University of Virginia
+            location_point = (lat, lng)
+            uva_point = uva_coordinates
+            distance = geopy.distance.distance(uva_point, location_point).miles
+
+            if distance <= 10:
+                # Location is within the 10-mile radius, proceed to save
+                location = Location(
+                    name=form.cleaned_data['name'],
+                    location_type=form.cleaned_data['location_type'],
+                    on_grounds=form.cleaned_data['on_grounds'],
+                    description=form.cleaned_data['description'],
+                    overall_rating=form.cleaned_data['overall_rating'],
+                    comfort_rating=form.cleaned_data['comfort_rating'],
+                    noise_level_rating=form.cleaned_data['noise_level_rating'],
+                    crowdedness_rating=form.cleaned_data['crowdedness_rating'],
+                    lat=lat,
+                    lng=lng,
+                )
+                location.save()
+
+                # Redirect to a success page or any other desired action
+                return redirect('success_page')
+            else:
+                # Location is outside the 10-mile radius
+                error_message = "Location must be closer to the University of Virginia."
+        else:
+            error_message = "Invalid form data."
+    else:
+        form = LocationForm()
+
+    return render(request, 'addNewLocation.html', {'form': form, 'error_message': error_message})
