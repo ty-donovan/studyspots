@@ -1,5 +1,5 @@
 // noinspection JSDeprecatedSymbols
-const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0456, lng: -78.5034 }, primary_key: 2}];
+const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
 function createAddSpotButton() {
   const addSpotButton = document.createElement("button");
   addSpotButton.style.height = "40px";
