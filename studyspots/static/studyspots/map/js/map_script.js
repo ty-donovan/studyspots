@@ -1,5 +1,9 @@
 // noinspection JSDeprecatedSymbols
-const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
+// const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
+function getUrl(){
+  return "http://"+window.location.host+"/";
+}
+
 function createAddSpotButton() {
   const addSpotButton = document.createElement("button");
   addSpotButton.style.height = "40px";
@@ -53,26 +57,49 @@ function initMap() {
   var infowindow = new google.maps.InfoWindow({
      content: "Blank infowindow"
    });
-  locations.forEach(({position, primary_key}, i) => {
+  locations.forEach((location, i) => {
     const pin = new google.maps.marker.PinElement({
     })
     const marker = new google.maps.marker.AdvancedMarkerElement({
-      position,
+      position: location.coordinates,
       map,
-      title: `${primary_key}`,
+      title: location.name,
+      zIndex: location.location_id,
       content: pin.element,
     });
     marker.addListener("click", ({ domEvent, latLng }) => {
       const { target } = domEvent;
+      fetch(getUrl()+"load/spot/"+location.location_id)
+      .then((response) => response.json())
+      .then((data) =>{
       infowindow.setContent('<div>' +
-                '<h3> key_' + marker.title + '</h3>' +
-                '<p> word  </p>' +
-                '<a href="'+marker.title+'">Location Page</a>' +
-                '</div>');
+                '<h3> ' + location.name + '</h3>' +
+                '<h6>' + location.location_type + '</h6>' +
+                '<p>' + location.address + '</p>' +
+                formatPostLinks(data))
+        console.log(data);
+      });
       infowindow.open(map, marker)
-      console.log(marker.title)
+      console.log(location.location_id)
     });
   })
+}
+
+function formatPostLinks(data){
+  if(data.length > 0){
+    let output = ""
+    data.forEach(function(spot){
+      console.log(data)
+      output += '<a ' +
+      'href="'+getUrl()+'map/'+spot.location_id+'/'+spot.space_id+'/" ' +
+      'title="'+spot.space_type+': ('+"fix ratings"+' out of 5)">'+
+      spot.name
+      +'</a>';
+    });
+    return output;
+  }else{
+    return '<a href="'+getUrl()+'map/new/'+location.location_id+'">Add a study spot</a>'
+  }
 }
 
 //   function placeMarkerAndPanTo(latLng, map) {

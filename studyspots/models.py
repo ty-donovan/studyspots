@@ -1,12 +1,10 @@
+from rest_framework import serializers
 from django.db import models
-
 
 class Location(models.Model):
     # variable as identifier for each location
     location_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    # this variable tells whether the building is on grounds or not. note: the prepopulated ones will all be set to true
-    on_grounds = models.BooleanField(default=False)
     # these are the location types that we have as of now, may want to change later. I added a default "Other" to
     # account for buildings/locations such as the Rotunda or a rec center that doesn't fit as nicely into a category
     TYPE_CHOICES = [
@@ -20,13 +18,22 @@ class Location(models.Model):
     # the address of the location in written form
     address = models.CharField(max_length=255)
     # coordinates is stored as a string with lat and long seperated by a comma
-    coordinates = models.CharField(max_length=50)
+    lat = models.DecimalField(max_digits=10, decimal_places=7, default=0.0)
+    lng = models.DecimalField(max_digits=10, decimal_places=7, default=0.0)
+    # see coordinate constructor
+
     # want to support images if this is something we choose to add later. note: this directory does not exist yet
     # image = models.ImageField(upload_to='study_location_images/', null=True, blank=True)
     # We don't have links for any of the buildings rn. Could be nice to give option for businesses to put website.
     # could also be a link to the Google Maps location if we want to change it to that (it would be easy to generate
     # this url based on the coordinates/address)
-    link = models.URLField(max_length=200, null=True, blank=True)
+    # this variable tells whether the building is on grounds or not. note: the prepopulated ones will all be set to true
+    on_grounds = models.BooleanField(default=False)
+    link = models.URLField(max_length=200, null=True, blank=True, default=None)
+
+    @property
+    def coordinates(self):
+        return {'lat': float(str(self.lat)), 'lng': float(str(self.lng))}
 
     def __str__(self):
         return self.name
@@ -34,6 +41,17 @@ class Location(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
+class LocationSerializer(serializers.ModelSerializer):
+    coordinates = models.CharField()
+    class Meta:
+        model = Location
+        fields = ['location_id', 'name', 'location_type', 'address', 'coordinates', 'on_grounds', 'link']
+
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     data["coordinates"] = f"{data['lat']}, {data['lng']}"
+    #     return data
 
 
 def calculate_average_rating(ratings_list):
@@ -46,7 +64,7 @@ def calculate_average_rating(ratings_list):
     return total_ratings / num_ratings
 
 
-class StudySpace(models.Model):
+class StudySpot(models.Model):
     # unique identifier for each space entry
     space_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
@@ -92,3 +110,9 @@ class StudySpace(models.Model):
 
     def calculate_crowdedness_rating(self):
         return calculate_average_rating(self.crowdedness_ratings)
+
+
+class StudySpotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudySpot
+        fields = "__all__"
