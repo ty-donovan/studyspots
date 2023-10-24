@@ -8,7 +8,9 @@
         src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script>
     const icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
-    //const locations = [];
+    const locations = [{{locations|safe}}][0];
+    console.log(locations)
+cdff1cf512c90b4904aed7bf2134195f212e7851
 </script>
 <script src="{% static 'studyspots/map/js/map_script.js' %}"></script>
 
