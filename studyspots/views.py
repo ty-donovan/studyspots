@@ -51,8 +51,10 @@ def map(request):
 
 # Add all the locations from the file to database. Do not use.
 def load(request):
-    locations = dict({"Unauthorized": "You do not have permission to access this resource"})
-    if request.user.is_staff:
+    json_response = dict({"Success": "Resource successfully added to database"})
+    if Location.objects.exists():
+        json_response = {"No need": "Locations db already populated"}
+    else:
         with open('locations.json') as json_file:
             locations = json.load(json_file)
         for location_dict in locations:
@@ -60,7 +62,7 @@ def load(request):
             for k, v in location_dict.items():
                 setattr(location, k, v)
             location.save()
-    return JsonResponse(locations, safe=False)
+    return JsonResponse(json_response, safe=False)
 
 
 def get_location_data(request):
