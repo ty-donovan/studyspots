@@ -73,7 +73,7 @@ class StudySpace(models.Model):
     overall_ratings = models.JSONField(default=list)
     comfort_ratings = models.JSONField(default=list)
     noise_level_ratings = models.JSONField(default=list)
-    crookedness_ratings = models.JSONField(default=list)
+    crowdedness_ratings = models.JSONField(default=list)
     # If it is reservable, the link will be to the reserving page (see spreadsheet for these links).
     # If not reservable, this field should probably just stay empty
     link = models.URLField(max_length=200, null=True, blank=True)
@@ -90,5 +90,5 @@ class StudySpace(models.Model):
     def calculate_noise_level_rating(self):
         return calculate_average_rating(self.noise_level_ratings)
 
-    def calculate_crookedness_rating(self):
-        return calculate_average_rating(self.crookedness_ratings)
+    def calculate_crowdedness_rating(self):
+        return calculate_average_rating(self.crowdedness_ratings)
