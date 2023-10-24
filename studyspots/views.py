@@ -48,6 +48,9 @@ def map(request):
     # return JsonResponse(list(locations), safe=False)
     return render(request, 'studyspots/map.html', context)
 
+def add(request):
+    return render(request, 'studyspots/add.html')
+
 
 # Add all the locations from the file to database. Do not use.
 def load(request):
