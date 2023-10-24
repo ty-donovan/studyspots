@@ -22,7 +22,7 @@ class Location(models.Model):
     # coordinates is stored as a string with lat and long seperated by a comma
     coordinates = models.CharField(max_length=50)
     # want to support images if this is something we choose to add later. note: this directory does not exist yet
-    #image = models.ImageField(upload_to='study_location_images/', null=True, blank=True)
+    # image = models.ImageField(upload_to='study_location_images/', null=True, blank=True)
     # We don't have links for any of the buildings rn. Could be nice to give option for businesses to put website.
     # could also be a link to the Google Maps location if we want to change it to that (it would be easy to generate
     # this url based on the coordinates/address)
