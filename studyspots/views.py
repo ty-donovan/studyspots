@@ -52,7 +52,11 @@ def add(request):
     return render(request, 'studyspots/add.html')
 
 def addNewLocation(request):
-    return render(request, 'studyspots/addNewLocation.html')
+    key = settings.GOOGLE_API_KEY
+    context = {
+        'key': key
+    }
+    return render(request, 'studyspots/addNewLocation.html', context)
 
 def addNewSpot(request):
     return render(request, 'studyspots/addNewSpot.html')
