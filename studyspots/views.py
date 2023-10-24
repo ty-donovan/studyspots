@@ -51,6 +51,12 @@ def map(request):
 def add(request):
     return render(request, 'studyspots/add.html')
 
+def addNewLocation(request):
+    return render(request, 'studyspots/addNewLocation.html')
+
+def addNewSpot(request):
+    return render(request, 'studyspots/addNewSpot.html')
+
 
 # Add all the locations from the file to database. Do not use.
 def load(request):
