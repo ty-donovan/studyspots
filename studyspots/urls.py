@@ -11,5 +11,5 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("login/", views.profile, name="login"),
     path("load/", views.load, name="load"),
-    path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"),
+    path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"), #hi 
 ]
