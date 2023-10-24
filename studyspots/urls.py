@@ -11,4 +11,5 @@ urlpatterns = [
     path("login/", views.profile, name="login"),
     path("load/", views.load, name="load"),
     path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"),
+    path("map/study_spot_<int:study_spot_id>/", views.study_spot, name="study_spot"),
 ]

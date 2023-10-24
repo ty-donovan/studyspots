@@ -34,12 +34,31 @@ nav {
     font-size: 1rem;
 }
 
+.comment-list {
+    max-height: 40vh; /* Adjust as needed */
+    overflow-y: auto;
+}
+
+.comment-text {
+    border: 1px solid #000; /* Adjust as needed */
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 1rem;
+}
+
 @media (max-width: 1000px) {
     .nav-link-text {
         font-size: 2rem;
     }
 
     .home-text {
+        font-size: 2rem;
+    }
+
+    .comment-text {
+        border: 1px solid #000; /* Adjust as needed */
+        margin-bottom: 10px;
+        padding: 10px;
         font-size: 2rem;
     }
 
@@ -58,5 +77,11 @@ nav {
     
     #map {
         height: 80vh;
+    }
+
+    .comment-list {
+        max-height: 60vh; /* Adjust as needed */
+        overflow-y: auto;
+        width: 100%;
     }
 }
