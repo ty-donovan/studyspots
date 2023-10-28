@@ -91,7 +91,7 @@ function formatPostLinks(data){
     data.forEach(function(spot){
       console.log(data)
       output += '<a ' +
-      'href="'+getUrl()+'map/'+spot.location_id+'/'+spot.space_id+'/" ' +
+      'href="'+getUrl()+'map/location'+spot.location_id+'/studyspot'+spot.space_id+'/" ' +
       'title="'+spot.space_type+': ('+"fix ratings"+' out of 5)">'+
       spot.name
       +'</a>';

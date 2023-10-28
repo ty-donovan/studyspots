@@ -76,6 +76,12 @@ def get_spot_data(request, location_id):
         study_spot = StudySpotSerializer(location.studyspot_set.all(), many=True).data
     return JsonResponse(study_spot, safe=False)
 
-def study_spot(request, study_spot_id):
+def study_spot(request, location_id, study_spot_id):
     study_spot = StudySpot.objects.get(space_id=study_spot_id)
     return render(request, 'studyspots/study_spot.html', {'study_spot': study_spot})
+
+# def update_study_spot(request, location_id, study_spot_id):
+#     study_spot = StudySpot.objects.get(space_id=study_spot_id)
+
+#     study_spot.overall_ratings.append(5)
+#     return render(request, 'studyspots/study_spot.html', {'study_spot': study_spot})
