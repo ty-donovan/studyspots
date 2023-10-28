@@ -13,4 +13,6 @@ urlpatterns = [
     path("load/", views.load, name="load"),
     path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"),
     path("map/location<int:location_id>/studyspot<int:study_spot_id>/", views.study_spot, name="study_spot"),
+    path("map/location<int:location_id>/studyspot<int:study_spot_id>/review_spot/", views.review_spot, name="review_spot"),
+    path("map/location<int:location_id>/studyspot<int:study_spot_id>/process_review/", views.process_review, name="process_review")
 ]
