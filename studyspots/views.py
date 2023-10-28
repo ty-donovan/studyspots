@@ -84,12 +84,16 @@ def get_spot_data(request, location_id):
 def study_spot(request, location_id, study_spot_id):
     study_spot = StudySpot.objects.get(space_id=study_spot_id)
   
-    return render(request, 'studyspots/study_spot.html', {'study_spot': study_spot})
+    return render(request, 'studyspots/study_spot.html', {'study_spot': study_spot, 'location_id': location_id})
 
 
 # method to render a form to add a review for a study spot
 def review_spot(request, location_id, study_spot_id):
-    return render(request, 'studyspots/study_spot_form.html', {'study_spot_id': study_spot_id, 'location_id': location_id})
+    study_spot = StudySpot.objects.get(space_id=study_spot_id)
+
+    return render(request, 'studyspots/study_spot_form.html', {'study_spot_id': study_spot_id,
+                                                                'location_id': location_id,
+                                                                'study_spot': study_spot})
 
 
 # method to process a review for a study spot and update database

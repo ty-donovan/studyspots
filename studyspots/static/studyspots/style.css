@@ -35,7 +35,7 @@ nav {
 }
 
 .comment-list {
-    max-height: 40vh; /* Adjust as needed */
+    max-height: 33vh; /* Adjust as needed */
     overflow-y: auto;
 }
 
@@ -44,6 +44,18 @@ nav {
     margin-bottom: 10px;
     padding: 10px;
     font-size: 1rem;
+}
+
+.review_spot_btn {
+    position: absolute; 
+    top: 43%; 
+    right: 0; 
+    margin-right: 15px;
+}
+
+.btn {
+    background-color: #003368; 
+    color: #ffffff;
 }
 
 @media (max-width: 1000px) {
@@ -83,5 +95,20 @@ nav {
         max-height: 60vh; /* Adjust as needed */
         overflow-y: auto;
         width: 100%;
+    }
+
+    .form-p {
+        font-size: 1.5rem;
+    }
+
+    .review_spot_btn {
+        position: absolute; 
+        top: 27.5%; 
+        right: 0; 
+        margin-right: 15px;
+    }
+
+    .btn {
+        font-size: 1.25rem;
     }
 }
