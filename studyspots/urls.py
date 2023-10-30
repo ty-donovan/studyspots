@@ -8,10 +8,11 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("map/", views.map, name="map"),
     path("add/", views.add, name="add"),
-    path("addNewLocation/", views.addNewLocation, name="addNewLocation"),
-    path("addNewSpot/", views.addNewSpot, name="addSpot"),
+    path("addNewLocation/", views.nonExistingLocation, name="addNewLocation"),
+    path("addNewSpot/<int:location_id>/", views.addNewSpot, name="addSpot"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("login/", views.profile, name="login"),
     path("load/", views.load, name="load"),
     path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"),
+    path("confirmation/", views.confirmation, name="confirmation"),
 ]

@@ -1,60 +1,86 @@
 {% extends 'base.html' %}
-
 {% block content %}
 {% load static %}
-
-
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 
 <body style="margin-bottom: 150px;">
     <div class="container mt-5">
         <form method="post">
             {% csrf_token %}
-            <div id="map" style="width: 100%; height: 400px;"></div>
-            <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
-            <div class="mb-3">
-                {{ form.name.label_tag }}
-                {{ form.name }}
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <!-- Add Location Section -->
+                        <h3>Add Location:</h3> 
+                        <div id="map" style="width: 100%; height: 400px;"></div>
+                        <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
+                        <div class="mb-3">
+                            {{ form.locationName.label_tag }}
+                            {{ form.locationName }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.location_type.label_tag }}
+                            {{ form.location_type }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.on_grounds.label_tag }}
+                            {{ form.on_grounds }}
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Divider -->
+                <div class="row">
+                    <div class="col">
+                        <hr class="my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <!-- Add Spot Section -->
+                        <h3>Add Spot:</h3> 
+                        <div class="mb-3">
+                            {{ form.spotName.label_tag }}
+                            {{ form.spotName }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.capacity.label_tag }}
+                            {{ form.capacity }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.comment.label_tag }}
+                            {{ form.comment }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.overall_rating.label_tag }}
+                            {{ form.overall_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.comfort_rating.label_tag }}
+                            {{ form.comfort_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.noise_level_rating.label_tag }}
+                            {{ form.noise_level_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.crowdedness_rating.label_tag }}
+                            {{ form.crowdedness_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.lat }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.lng }}
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-primary mt-3" value="Submit Location & Spot for Approval">
+                        </div>
+                        {% if error_message %}
+                            <p class="text-danger mt-3">{{ error_message }}</p>
+                        {% endif %}      
+                </div>
             </div>
-            <div class="mb-3">
-                {{ form.location_type.label_tag }}
-                {{ form.location_type }}
-            </div>
-            <div class="mb-3">
-                {{ form.on_grounds.label_tag }}
-                {{ form.on_grounds }}
-            </div>
-            <div class="mb-3">
-                {{ form.description.label_tag }}
-                {{ form.description }}
-            </div>
-            <div class="mb-3">
-                {{ form.overall_rating.label_tag }}
-                {{ form.overall_rating }}
-            </div>
-            <div class="mb-3">
-                {{ form.comfort_rating.label_tag }}
-                {{ form.comfort_rating }}
-            </div>
-            <div class="mb-3">
-                {{ form.noise_level_rating.label_tag }}
-                {{ form.noise_level_rating }}
-            </div>
-            <div class="mb-3">
-                {{ form.crowdedness_rating.label_tag }}
-                {{ form.crowdedness_rating }}
-            </div>
-            <div class="mb-3">
-                {{ form.lat }}
-            </div>
-            <div class="mb-3">
-                {{ form.lng }}
-            </div>
-    
-            <input type="submit" class="btn btn-primary mt-3" value="Submit Location">
-            {% if error_message %}
-                <p class="text-danger mt-3">{{ error_message }}</p>
-            {% endif %}
         </form>
     </div>
 
@@ -68,7 +94,6 @@
                 center: initialLocation,
                 zoom: 15
             });
-
             // Create a draggable marker
             marker = new google.maps.Marker({
                 position: initialLocation,
@@ -83,12 +108,11 @@
                 document.getElementById("id_lng").value = coordinates.lng();
             });
         }
-
         google.maps.event.addDomListener(window, 'load', initMap);
     </script>
 
     <!-- Add your Google Maps API script tag here -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_aGOFSr8wyH9OwRMQabuKm3dkiB5ix0o&libraries=places&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=places&callback=initMap"></script>
 
 </body>
 
