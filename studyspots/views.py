@@ -108,7 +108,8 @@ def nonExistingLocation(request):
                 location.save()
 
                 spot = PendingStudySpot(
-                    location_id = location,
+                    content_type=ContentType.objects.get_for_model(location),
+                    object_id=location.pk,
                     name=form.cleaned_data['spotName'],
                     capacity = form.cleaned_data['capacity'],
                     comments=[form.cleaned_data['comment']],
@@ -145,7 +146,8 @@ def addNewSpot(request, location_id):
         if form.is_valid():
             location = Location.objects.get(pk=location_id)
             spot = PendingStudySpot(
-                    location_id = location,
+                    content_type=ContentType.objects.get_for_model(location),
+                    object_id=location.pk,
                     name=form.cleaned_data['spotName'],
                     capacity = form.cleaned_data['capacity'],
                     comments=[form.cleaned_data['comment']],

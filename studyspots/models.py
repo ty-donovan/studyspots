@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 class Location(models.Model):
     # variable as identifier for each location
@@ -156,7 +158,14 @@ class PendingStudySpot(models.Model):
     # unique identifier for each space entry
     space_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
-    location_id = models.ForeignKey(PendingLocation, on_delete=models.CASCADE)
+    # location_id = models.ForeignKey(PendingLocation, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        default=None  # Default value is None, which is safe for existing entries
+    )
+    object_id = models.PositiveIntegerField(default=None)
+    location = GenericForeignKey('content_type', 'object_id')
     name = models.CharField(max_length=100)
     # these are all the types I could think of. Might want to add others later
     TYPE_CHOICES = [
