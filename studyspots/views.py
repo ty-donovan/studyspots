@@ -70,7 +70,7 @@ def add(request):
             # Redirect to the "addSpot" URL with the selected location's ID
             if selected_location:
                 location_id = selected_location.location_id
-                return redirect('addSpot', location_id=location_id)
+                return redirect('studyspots:addNewSpot', location_id=location_id)
     
     else:
         existing_location_form = SelectExistingLocationForm()
@@ -126,7 +126,7 @@ def nonExistingLocation(request):
                 # Location is outside the 10-mile radius
                 error_message = "Location must be closer to the University of Virginia."
         else:
-            error_message = "Invalid form data. Note: You must move the pin from it's original position"
+            error_message = "Invalid form data: you must move the pin from it's original position"
     else:
         form = newLocationForm()
 

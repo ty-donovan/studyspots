@@ -21,7 +21,8 @@ function createAddSpotButton() {
   addSpotButton.title = "Click to add a study spot";
   addSpotButton.type = "button";
   addSpotButton.addEventListener("click", () => {
-    console.log("yup")
+    const addUrl = '/add/';
+    window.location.href = addUrl;
   });
   const addSpotIcon = document.createElement('img');
   addSpotIcon.src = icon;
@@ -76,7 +77,7 @@ function initMap() {
                 '<h3> ' + location.name + '</h3>' +
                 '<h6>' + location.location_type + '</h6>' +
                 '<p>' + location.address + '</p>' +
-                formatPostLinks(data))
+                formatPostLinks(location.location_id, data))
         console.log(data);
       });
       infowindow.open(map, marker)
@@ -85,7 +86,7 @@ function initMap() {
   })
 }
 
-function formatPostLinks(data){
+function formatPostLinks(loc_id, data){
   if(data.length > 0){
     let output = ""
     data.forEach(function(spot){
@@ -98,7 +99,7 @@ function formatPostLinks(data){
     });
     return output;
   }else{
-    return '<a href="'+getUrl()+'map/new/'+location.location_id+'">Add a study spot</a>'
+    return '<a href="'+getUrl()+'addNewSpot/'+loc_id+'">Add a study spot</a>'
   }
 }
 

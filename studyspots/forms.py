@@ -69,7 +69,8 @@ class newLocationForm(forms.Form):
         required=True  # Mark the field as required
     )
     comment = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
+        ,
         required=False
     )
     overall_rating = forms.ChoiceField(
@@ -110,7 +111,8 @@ class existingLocationForm(forms.Form):
         required=True  # Mark the field as required
     )
     comment = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control'}),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
+        ,
         required=False
     )
     overall_rating = forms.ChoiceField(
