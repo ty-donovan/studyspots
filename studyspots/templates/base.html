@@ -24,6 +24,12 @@
                         <li class="nav-item">
                             <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:map' %}">Map</a>
                         </li>
+                        {% load socialaccount %}
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:add' %}">Add New Spot</a>
+                        </li>
+                        {% endif %}
                         <li class="nav-item">
                             {% load socialaccount %}
                             {% if user.is_authenticated %}
