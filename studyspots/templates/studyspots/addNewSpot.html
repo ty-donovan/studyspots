@@ -13,11 +13,11 @@
                         <!-- Add Spot Section -->
                         <h3>Add Spot:</h3> 
                         <div class="mb-3">
-                            {{ form.spotName.label_tag }}
+                            {{ form.spotName.label_tag }}{% if form.spotName.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.spotName }}
                         </div>
                         <div class="mb-3">
-                            {{ form.capacity.label_tag }}
+                            {{ form.capacity.label_tag }}{% if form.capacity.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.capacity }}
                         </div>
                         <div class="mb-3">
@@ -25,26 +25,20 @@
                             {{ form.comment }}
                         </div>
                         <div class="mb-3">
-                            {{ form.overall_rating.label_tag }}
+                            {{ form.overall_rating.label_tag }}{% if form.overall_rating.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.overall_rating }}
                         </div>
                         <div class="mb-3">
-                            {{ form.comfort_rating.label_tag }}
+                            {{ form.comfort_rating.label_tag }}{% if form.comfort_rating.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.comfort_rating }}
                         </div>
                         <div class="mb-3">
-                            {{ form.noise_level_rating.label_tag }}
+                            {{ form.noise_level_rating.label_tag }}{% if form.noise_level_rating.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.noise_level_rating }}
                         </div>
                         <div class="mb-3">
-                            {{ form.crowdedness_rating.label_tag }}
+                            {{ form.crowdedness_rating.label_tag }}{% if form.crowdedness_rating.field.required %}<span class="text-danger">*</span>{% endif %}
                             {{ form.crowdedness_rating }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.lat }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.lng }}
                         </div>
                         <div class="text-center">
                             <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
