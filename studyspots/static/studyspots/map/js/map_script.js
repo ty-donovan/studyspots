@@ -1,41 +1,50 @@
 // noinspection JSDeprecatedSymbols
 // const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
-function getUrl(){
-  return "http://"+window.location.host+"/";
+function getUrl(url = ""){
+  return "http://"+window.location.host+"/"+url;
 }
 
-function createAddSpotButton() {
-  const addSpotButton = document.createElement("button");
-  addSpotButton.style.height = "40px";
-  addSpotButton.style.width = "40px";
-  addSpotButton.style.backgroundColor = "#fff";
-  addSpotButton.style.border = "2px solid #fff";
-  addSpotButton.style.margin = "10px";
-  addSpotButton.style.padding = "0px";
-  addSpotButton.style.borderRadius = "2px";
-  addSpotButton.style.boxShadow = "0px 1px 4px -1px rgba(0,0,0,.3)";
-  addSpotButton.style.cursor = "pointer";
-  addSpotButton.style.lineHeight = "38px";
-  addSpotButton.style.overflow = "hidden";
-  addSpotButton.style.textAlign = "center";
-  addSpotButton.title = "Click to add a study spot";
-  addSpotButton.type = "button";
-  addSpotButton.addEventListener("click", () => {
-    console.log("yup")
+function fetchResource(url){
+   return fetch(getUrl(url), {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      })
+}
+
+function createAddStudySpace() {
+  const addStudySpaceButton = document.createElement("button");
+  addStudySpaceButton.style.height = "40px";
+  addStudySpaceButton.style.width = "40px";
+  addStudySpaceButton.style.backgroundColor = "#fff";
+  addStudySpaceButton.style.border = "2px solid #fff";
+  addStudySpaceButton.style.margin = "10px";
+  addStudySpaceButton.style.padding = "0px";
+  addStudySpaceButton.style.borderRadius = "2px";
+  addStudySpaceButton.style.boxShadow = "0px 1px 4px -1px rgba(0,0,0,.3)";
+  addStudySpaceButton.style.cursor = "pointer";
+  addStudySpaceButton.style.lineHeight = "38px";
+  addStudySpaceButton.style.overflow = "hidden";
+  addStudySpaceButton.style.textAlign = "center";
+  addStudySpaceButton.title = "Click to add a study spot";
+  addStudySpaceButton.type = "button";
+  addStudySpaceButton.addEventListener("click", () => {
+    window.location.href = getUrl('add');
   });
-  const addSpotIcon = document.createElement('img');
-  addSpotIcon.src = icon;
-  addSpotIcon.style.height = "24px";
-  addSpotIcon.style.width = "24px";
-  addSpotIcon.style.filter = "invert(47%) sepia(0%) saturate(252%) hue-rotate(202deg) brightness(81%) contrast(85%)"; //#666666
-  addSpotButton.appendChild(addSpotIcon);
-    addSpotButton.addEventListener("mouseleave", (event) => {
-      addSpotIcon.style.filter = "invert(47%) sepia(0%) saturate(252%) hue-rotate(202deg) brightness(81%) contrast(85%)"; //#666666
+  const addStudySpaceIcon = document.createElement('img');
+  addStudySpaceIcon.src = icon;
+  addStudySpaceIcon.style.height = "24px";
+  addStudySpaceIcon.style.width = "24px";
+  addStudySpaceIcon.style.filter = "invert(47%) sepia(0%) saturate(252%) hue-rotate(202deg) brightness(81%) contrast(85%)"; //#666666
+  addStudySpaceButton.appendChild(addStudySpaceIcon);
+    addStudySpaceButton.addEventListener("mouseleave", (event) => {
+      addStudySpaceIcon.style.filter = "invert(47%) sepia(0%) saturate(252%) hue-rotate(202deg) brightness(81%) contrast(85%)"; //#666666
   });
-  addSpotButton.addEventListener("mouseenter", (event) => {
-      addSpotIcon.style.filter = "invert(20%) sepia(0%) saturate(0%) hue-rotate(188deg) brightness(89%) contrast(95%)"; //#333333
+  addStudySpaceButton.addEventListener("mouseenter", (event) => {
+      addStudySpaceIcon.style.filter = "invert(20%) sepia(0%) saturate(0%) hue-rotate(188deg) brightness(89%) contrast(95%)"; //#333333
   });
-  return addSpotButton;
+  return addStudySpaceButton;
 }
 
 // Initialize and add the map
@@ -51,11 +60,11 @@ function initMap() {
         streetViewControl: false,
   });
   const centerControlDiv = document.createElement("div");
-  const addSpotButton = createAddSpotButton(); //creates
-  centerControlDiv.appendChild(addSpotButton);
-  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(addSpotButton);
+  const addStudySpaceButton = createAddStudySpace(); //creates
+  centerControlDiv.appendChild(addStudySpaceButton);
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(addStudySpaceButton);
   var infowindow = new google.maps.InfoWindow({
-     content: "Blank infowindow"
+     content: ""
    });
   locations.forEach((location, i) => {
     const pin = new google.maps.marker.PinElement({
@@ -69,7 +78,9 @@ function initMap() {
     });
     marker.addListener("click", ({ domEvent, latLng }) => {
       const { target } = domEvent;
-      fetch(getUrl()+"load/spot/"+location.location_id)
+      infowindow.setContent('');
+      infowindow.close();
+      fetchResource("load/location_"+location.location_id)
       .then((response) => response.json())
       .then((data) =>{
       infowindow.setContent('<div>' +
@@ -77,26 +88,19 @@ function initMap() {
                 '<h6>' + location.location_type + '</h6>' +
                 '<p>' + location.address + '</p>' +
                 formatPostLinks(data, location))
-        console.log(data);
-
       }).then(infowindow.open(map, marker));
-
-      console.log(location.location_id)
     });
   })
 }
 
 function formatPostLinks(data, location){
-  let output = ""
-  data.forEach(function(spot){
-    console.log(data)
-    output += '<a ' +
-    'href="'+getUrl()+'map/'+spot.location_id+'/'+spot.space_id+'/" ' +
-    'title="'+spot.space_type+': ('+"fix ratings"+' out of 5)">'+
-    spot.name
-    +'</a><br>';
+  let output = "";
+  data.forEach(function(studyspace){
+    //console.log(data)
+    output += `<a href="${getUrl("location_"+location.location_id + "/space_" + studyspace.space_id + "/")}"`+
+              `title="${studyspace.space_type}: (fix ratings out of 5)">${studyspace.name}</a><br>`;
   });
-  output += '<a href="'+getUrl()+'map/new/'+location.location_id+'">Add a study spot</a>'
+  output += '<a href="'+getUrl('add/location_'+location.location_id)+'">Add a new study spot</a>'
   return output;
 }
 

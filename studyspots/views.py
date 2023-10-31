@@ -8,6 +8,10 @@ import json
 from studyspots.models import *
 
 
+def is_ajax(request):
+    return request.META['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest"
+
+
 @login_required
 def profile(request):
     if request.user.is_staff:
@@ -69,13 +73,13 @@ def load(request):
     return JsonResponse(json_response, safe=False)
 
 
-def get_location_data(request):
-    pass
-
-
-def get_spot_data(request, location_id):
-    study_spot = {"404": "Resource not found"}
-    if request.method == "GET":
+def get_location_data(request, location_id):
+    study_spot = [{"404": "Resource not found"}]
+    if request.method == "GET" and is_ajax(request):
         location = Location.objects.get(location_id=location_id)
         study_spot = StudySpaceSerializer(location.studyspace_set.all(), many=True).data
     return JsonResponse(study_spot, safe=False)
+
+
+def get_spot_data(request, studyspace_id):
+    pass

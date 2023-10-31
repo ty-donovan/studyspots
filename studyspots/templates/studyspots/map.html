@@ -2,14 +2,16 @@
 
 {% block content %}
 {% load static %}
-<script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>
+{#<script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>#}
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 <script
         src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script>
     const icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
     const locations = [{{locations|safe}}][0];
-    console.log(locations)
+    const get_location_data_url = "{% url 'studyspots:get_location_data' 0 %}"
+    const get_studyspace_data_url = "{% url 'studyspots:get_studyspace_data' 0 0 %}"
+    const map_url = "{% url 'studyspots:map'%}"
 </script>
 <script src="{% static 'studyspots/map/js/map_script.js' %}"></script>
 
