@@ -76,30 +76,28 @@ function initMap() {
                 '<h3> ' + location.name + '</h3>' +
                 '<h6>' + location.location_type + '</h6>' +
                 '<p>' + location.address + '</p>' +
-                formatPostLinks(data))
+                formatPostLinks(data, location))
         console.log(data);
-      });
-      infowindow.open(map, marker)
+
+      }).then(infowindow.open(map, marker));
+
       console.log(location.location_id)
     });
   })
 }
 
-function formatPostLinks(data){
-  if(data.length > 0){
-    let output = ""
-    data.forEach(function(spot){
-      console.log(data)
-      output += '<a ' +
-      'href="'+getUrl()+'map/'+spot.location_id+'/'+spot.space_id+'/" ' +
-      'title="'+spot.space_type+': ('+"fix ratings"+' out of 5)">'+
-      spot.name
-      +'</a>';
-    });
-    return output;
-  }else{
-    return '<a href="'+getUrl()+'map/new/'+location.location_id+'">Add a study spot</a>'
-  }
+function formatPostLinks(data, location){
+  let output = ""
+  data.forEach(function(spot){
+    console.log(data)
+    output += '<a ' +
+    'href="'+getUrl()+'map/'+spot.location_id+'/'+spot.space_id+'/" ' +
+    'title="'+spot.space_type+': ('+"fix ratings"+' out of 5)">'+
+    spot.name
+    +'</a><br>';
+  });
+  output += '<a href="'+getUrl()+'map/new/'+location.location_id+'">Add a study spot</a>'
+  return output;
 }
 
 //   function placeMarkerAndPanTo(latLng, map) {
