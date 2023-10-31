@@ -30,6 +30,8 @@ IS_HEROKU_APP = "DYNO" in os.environ and "CI" not in os.environ
 
 if not IS_HEROKU_APP:
     DEBUG = True
+elif 'DEBUG' in os.environ:
+    DEBUG = os.environ['DEBUG']
 
 if IS_HEROKU_APP:
     ALLOWED_HOSTS = ["*"]
