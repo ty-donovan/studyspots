@@ -77,5 +77,5 @@ def get_spot_data(request, location_id):
     study_spot = {"404": "Resource not found"}
     if request.method == "GET":
         location = Location.objects.get(location_id=location_id)
-        study_spot = StudySpaceSerializer(location.studyspot_set.all(), many=True).data
+        study_spot = StudySpaceSerializer(location.studyspace_set.all(), many=True).data
     return JsonResponse(study_spot, safe=False)

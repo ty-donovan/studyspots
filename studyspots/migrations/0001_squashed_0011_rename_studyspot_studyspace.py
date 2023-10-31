@@ -6,8 +6,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    # replaces = [('studyspots', '0001_squashed_0010_rename_studyspace_studyspot'), ('studyspots', '0011_rename_studyspot_studyspace')]
-
     initial = True
 
     dependencies = [
