@@ -64,7 +64,7 @@ def calculate_average_rating(ratings_list):
     return total_ratings / num_ratings
 
 
-class StudySpot(models.Model):
+class StudySpace(models.Model):
     # unique identifier for each space entry
     space_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
@@ -112,7 +112,7 @@ class StudySpot(models.Model):
         return calculate_average_rating(self.crowdedness_ratings)
 
 
-class StudySpotSerializer(serializers.ModelSerializer):
+class StudySpaceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = StudySpot
+        model = StudySpace
         fields = "__all__"
