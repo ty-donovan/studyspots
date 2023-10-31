@@ -48,6 +48,7 @@ def map(request):
     # return JsonResponse(list(locations), safe=False)
     return render(request, 'studyspots/map.html', context)
 
+
 def add(request):
     return render(request, 'studyspots/add.html')
 
