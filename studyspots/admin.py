@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Location, StudySpace
+from .models import Location, StudySpace, PendingStudySpot, PendingLocation
 
 
 class StudySpaceAdmin(admin.ModelAdmin):
@@ -9,4 +9,6 @@ class StudySpaceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Location)
+admin.site.register(PendingStudySpot)
+admin.site.register(PendingLocation)
 admin.site.register(StudySpace, StudySpaceAdmin)

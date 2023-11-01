@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
+<script>
+    const locations = [{{locations|safe}}][0];
+    locations.sort((a, b) => a.name.localeCompare(b.name));
+    console.log(locations)
+</script>
+<div class="container mt-5">
+    <h4>Select an option:</h4>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="d-grid gap-2 col-6 mx-auto mt-4">
+            <button type="button" id="existing-location-button" class="btn btn-primary btn-lg" onclick="showExistingLocationDropdown()">Within an existing location</button>
+        </div>
+        <div id="existing-location-dropdown" style="display: none;" class="my-3">
+            <div class="col-6 mx-auto">
+                <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
+                    <option value="" disabled selected>Select an existing location</option>
+                    <script>
+                        // Access the `locations` variable
+                        locations.forEach(function(location) {
+                            document.write(`<option value="${location.location_id}">${location.name}</option>`);
+                        });
+                    </script>
+                </select>
+            </div>
+        </div>
+        <button type="submit" id="add-button" class="btn btn-success btn-med mx-auto" style="display: none" disabled>Add within this location</button>
+        <div class="d-grid gap-2 col-6 mx-auto mt-3">
+            <a href="{% url 'studyspots:addNewLocation' %}" class="btn btn-primary btn-lg">Not Within an Existing Location</a>
+        </div>
+
+        <script>
+            function showExistingLocationDropdown() {
+                var dropdown = document.getElementById('existing-location-dropdown');
+                var button = document.getElementById('existing-location-button');
+                var addButton = document.getElementById('add-button');
+                if (dropdown.style.display === 'none') {
+                    dropdown.style.display = 'block';
+                    addButton.style.display = 'block';
+                } else {
+                    dropdown.style.display = 'none';
+                    addButton.style.display = 'none';
+                }
+            }
+
+            var addLocationButton = document.getElementById('add-button');
+            var locationSelect = document.getElementById('existing-location-select');
+
+            locationSelect.addEventListener('change', function() {
+                if (locationSelect.value) {
+                    addLocationButton.classList.remove('disabled');
+                    addLocationButton.disabled = false;
+                } else {
+                    addLocationButton.classList.add('disabled');
+                    addLocationButton.disabled = true;
+                }
+            });
+
+            addLocationButton.addEventListener('click', function() {
+                var selectedLocation = locationSelect.value;
+                if (selectedLocation) {
+                    window.location.href = "{% url 'studyspots:addNewSpot' 0 %}".replace('0', selectedLocation);
+                }
+            });
+        </script>
+    </form>
+</div>
+{% endblock %}
+
+
+
