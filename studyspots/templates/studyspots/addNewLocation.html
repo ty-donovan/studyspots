@@ -81,6 +81,7 @@
                         {% endif %}      
                 </div>
             </div>
+            </div>
         </form>
     </div>
 
@@ -90,9 +91,9 @@
 
         function initMap() {
             var initialLocation = { lat: 38.0356, lng: -78.5034 }; // Default initial location (University of Virginia)
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: initialLocation,
-                zoom: 15
+            map = new google.maps.Map(document.getElementById("map"), {
+                  center: initialLocation,
+                  zoom: 17,
             });
             // Create a draggable marker
             marker = new google.maps.Marker({

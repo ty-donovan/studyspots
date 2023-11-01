@@ -64,7 +64,7 @@
             addLocationButton.addEventListener('click', function() {
                 var selectedLocation = locationSelect.value;
                 if (selectedLocation) {
-                    window.location.href = "{% url 'studyspots:addNewSpot' 0 %}".replace('0', selectedLocation);
+                    window.location.href = "{% url 'studyspots:add_new_spot' 0 %}".replace('0', selectedLocation);
                 }
             });
         </script>

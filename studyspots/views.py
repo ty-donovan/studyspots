@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.core import serializers
 import json
 import geopy.distance
-from .forms import newLocationForm
-from .forms import existingLocationForm
+from .forms import NewLocationForm
+from .forms import ExistingLocationForm
 from .models import Location
 from .forms import SelectExistingLocationForm
 
@@ -72,12 +70,6 @@ def map_redirect(request):
 
 
 def add(request, location_id=None):
-    if location_id is not None:
-        print("a")
-    return render(request, 'studyspots/add.html')
-# def add(request):
-#     return render(request, 'studyspots/add.html')
-def add(request):
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
     if request.method == 'POST':
@@ -99,12 +91,13 @@ def add(request):
     }
     return render(request, 'studyspots/add.html', context)
 
-def nonExistingLocation(request):
+
+def non_existing_location(request):
     key = settings.GOOGLE_API_KEY
     error_message = None
 
     if request.method == 'POST':
-        form = newLocationForm(request.POST)
+        form = NewLocationForm(request.POST)
         if form.is_valid():
             # Get the coordinates from the form
             lat = form.cleaned_data['lat']
@@ -112,7 +105,7 @@ def nonExistingLocation(request):
 
             # Check if the location is within a 10-mile radius of the University of Virginia
             location_point = (lat, lng)
-            uva_point = (38.0356, -78.5034) # UVA coordinates
+            uva_point = (38.0356, -78.5034)  # UVA coordinates
             distance = geopy.distance.distance(uva_point, location_point).miles
 
             if distance <= 10:
@@ -130,7 +123,7 @@ def nonExistingLocation(request):
                     content_type=ContentType.objects.get_for_model(location),
                     object_id=location.pk,
                     name=form.cleaned_data['spotName'],
-                    capacity = form.cleaned_data['capacity'],
+                    capacity=form.cleaned_data['capacity'],
                     comments=[form.cleaned_data['comment']],
                     overall_ratings=[form.cleaned_data['overall_rating']],
                     comfort_ratings=[form.cleaned_data['comfort_rating']],
@@ -147,7 +140,7 @@ def nonExistingLocation(request):
         else:
             error_message = "Invalid form data: you must move the pin from it's original position"
     else:
-        form = newLocationForm()
+        form = NewLocationForm()
 
     context = {
         'key': key,
@@ -157,32 +150,33 @@ def nonExistingLocation(request):
 
     return render(request, 'studyspots/addNewLocation.html', context)
 
-def addNewSpot(request, location_id):
+
+def add_new_spot(request, location_id):
     error_message = None
 
     if request.method == 'POST':
-        form = existingLocationForm(request.POST)
+        form = ExistingLocationForm(request.POST)
         if form.is_valid():
             location = Location.objects.get(pk=location_id)
             spot = PendingStudySpot(
-                    content_type=ContentType.objects.get_for_model(location),
-                    object_id=location.pk,
-                    name=form.cleaned_data['spotName'],
-                    capacity = form.cleaned_data['capacity'],
-                    comments=[form.cleaned_data['comment']],
-                    overall_ratings=[form.cleaned_data['overall_rating']],
-                    comfort_ratings=[form.cleaned_data['comfort_rating']],
-                    noise_level_ratings=[form.cleaned_data['noise_level_rating']],
-                    crowdedness_ratings=[form.cleaned_data['crowdedness_rating']],
+                content_type=ContentType.objects.get_for_model(location),
+                object_id=location.pk,
+                name=form.cleaned_data['spotName'],
+                capacity=form.cleaned_data['capacity'],
+                comments=[form.cleaned_data['comment']],
+                overall_ratings=[form.cleaned_data['overall_rating']],
+                comfort_ratings=[form.cleaned_data['comfort_rating']],
+                noise_level_ratings=[form.cleaned_data['noise_level_rating']],
+                crowdedness_ratings=[form.cleaned_data['crowdedness_rating']],
             )
             spot.save()
 
-                # Redirect to map page or any other desired action
+            # Redirect to map page or any other desired action
             return redirect("../../confirmation")
         else:
             error_message = "Invalid form data."
     else:
-        form = existingLocationForm()
+        form = ExistingLocationForm()
 
     context = {
         'form': form,

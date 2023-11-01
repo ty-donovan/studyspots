@@ -1,6 +1,4 @@
-# forms.py
 from django import forms
-from location_field.forms.plain import PlainLocationField
 from .models import Location
 
 TYPE_CHOICES = [
@@ -19,6 +17,7 @@ RATING_CHOICES = [
     (5, '5'),
 ]
 
+
 class SelectExistingLocationForm(forms.Form):
     existing_location = forms.ModelChoiceField(
         queryset=Location.objects.order_by('name'),
@@ -28,8 +27,7 @@ class SelectExistingLocationForm(forms.Form):
     )
 
 
-
-class newLocationForm(forms.Form):
+class NewLocationForm(forms.Form):
     # These are the fields to add a location
     locationName = forms.CharField(
         label='Name of Location',
@@ -69,7 +67,8 @@ class newLocationForm(forms.Form):
         required=True  # Mark the field as required
     )
     comment = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
+        widget=forms.Textarea(
+            attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
         ,
         required=False
     )
@@ -95,9 +94,7 @@ class newLocationForm(forms.Form):
     )
 
 
-
-class existingLocationForm(forms.Form):
-    
+class ExistingLocationForm(forms.Form):
     spotName = forms.CharField(
         label='Name of Spot',
         max_length=100,
@@ -111,7 +108,8 @@ class existingLocationForm(forms.Form):
         required=True  # Mark the field as required
     )
     comment = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
+        widget=forms.Textarea(
+            attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
         ,
         required=False
     )

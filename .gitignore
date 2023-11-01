@@ -144,3 +144,5 @@ GitHub.sublime-settings
 /staticfiles/staticfiles.json
 /staticfiles/
 /db.dump
+/db.dump
+/db.dump
