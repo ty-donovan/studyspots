@@ -1,7 +1,10 @@
 // noinspection JSDeprecatedSymbols
 // const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
-function getUrl(url = ""){
-  return "http://"+window.location.host+"/"+url;
+function getUrl(url = "/"){
+  if(!url.startsWith("/")){
+    url = "/" + url;
+  }
+  return "http://"+window.location.host+url;
 }
 
 function fetchResource(url){
@@ -80,7 +83,7 @@ function initMap() {
       const { target } = domEvent;
       infowindow.setContent('');
       infowindow.close();
-      fetchResource("load/location_"+location.location_id)
+      fetchResource(get_location_data_url(location.location_id))
       .then((response) => response.json())
       .then((data) =>{
       infowindow.setContent('<div>' +
@@ -97,10 +100,10 @@ function formatPostLinks(data, location){
   let output = "";
   data.forEach(function(studyspace){
     //console.log(data)
-    output += `<a href="${getUrl("location_"+location.location_id + "/space_" + studyspace.space_id + "/")}"`+
+    output += `<a href="${getUrl(get_studyspace_data_url(location.location_id, studyspace.studyspace_id))}"`+
               `title="${studyspace.space_type}: (fix ratings out of 5)">${studyspace.name}</a><br>`;
   });
-  output += '<a href="'+getUrl('add/location_'+location.location_id)+'">Add a new study spot</a>'
+  output += '<a href="'+getUrl(get_add_with_location_url(location.location_id))+'">Add a new study spot</a>'
   return output;
 }
 

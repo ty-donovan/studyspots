@@ -66,7 +66,7 @@ def calculate_average_rating(ratings_list):
 
 class StudySpace(models.Model):
     # unique identifier for each space entry
-    space_id = models.AutoField(primary_key=True)
+    studyspace_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
     location_id = models.ForeignKey(Location, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
