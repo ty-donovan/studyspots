@@ -8,6 +8,10 @@ import json
 from studyspots.models import *
 
 
+def is_ajax(request):
+    return 'HTTP_X_REQUESTED_WITH' in request.META and request.META['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest"
+
+
 @login_required
 def profile(request):
     if request.user.is_staff:
@@ -48,7 +52,10 @@ def map(request):
     # return JsonResponse(list(locations), safe=False)
     return render(request, 'studyspots/map.html', context)
 
-def add(request):
+
+def add(request, location_id=None):
+    if location_id is not None:
+        print("a")
     return render(request, 'studyspots/add.html')
 
 
@@ -68,16 +75,19 @@ def load(request):
     return JsonResponse(json_response, safe=False)
 
 
-def get_location_data(request):
-    pass
-
-
-def get_spot_data(request, location_id):
-    study_spot = {"404": "Resource not found"}
-    if request.method == "GET":
+def get_location_data(request, location_id):
+    if request.method == "GET" and is_ajax(request):
         location = Location.objects.get(location_id=location_id)
-        study_spot = StudySpotSerializer(location.studyspot_set.all(), many=True).data
-    return JsonResponse(study_spot, safe=False)
+        location_data = StudySpaceSerializer(location.studyspace_set.all(), many=True).data
+        return JsonResponse(location_data, safe=False)
+    # render(request, )
+
+
+def get_studyspace_data(request, location_id, location_ordinal):
+    if request.method == "GET" and is_ajax(request):
+        location = Location.objects.get(location_id=location_id)
+        studyspace_data = StudySpaceSerializer(location.studyspace_set.get(location_ordinal=location_ordinal), many=False).data
+    return JsonResponse(studyspace_data, safe=False)
 
 
 # method to render information about a study spot
@@ -112,4 +122,3 @@ def process_review(request, location_id, study_spot_id):
         return redirect('studyspots:study_spot', location_id=location_id, study_spot_id=study_spot_id)
     else:
         return redirect('studyspots:study_spot', location_id=location_id, study_spot_id=study_spot_id)
-    
