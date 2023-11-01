@@ -89,7 +89,12 @@ function initMap() {
       infowindow.setContent(makeWindowContent(location, data))
       }).then(infowindow.open(map, marker));
     });
+    if(starting_location_id && starting_location_id === location.location_id){
+        new google.maps.event.trigger(marker, "click");
+        infowindow.focus();
+    }
   })
+
 }
 
 function makeWindowContent(location, data= null){

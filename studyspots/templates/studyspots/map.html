@@ -9,6 +9,7 @@
 <script>
     const icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
     const locations = [{{locations|safe}}][0];
+    const starting_location_id = [{{ location_id }}][0];
     function get_location_data_url(location_id){
         return "{% url 'studyspots:get_location_data' 100543 %}".replace("100543", location_id);
     }

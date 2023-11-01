@@ -6,8 +6,8 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h2 class="title-text">Review for {{ study_spot.name }}</h2>
-            <form action="{% url 'studyspots:process_review' location_id=location_id study_spot_id=study_spot_id %}" method="post" class="mt-5">
+            <h2 class="title-text">Review for {{ studyspace.name }}</h2>
+            <form action="{% url 'studyspots:process_studyspace_review' location_id studyspace.location_ordinal %}" method="post" class="mt-5">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="overall"><p class="form-p"><strong>Overall (1-5):</strong></p></label>

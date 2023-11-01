@@ -3,7 +3,6 @@ from django.dispatch import receiver
 from rest_framework import serializers
 from django.db import models, DEFAULT_DB_ALIAS
 
-
 class Location(models.Model):
     # variable as identifier for each location
     location_id = models.AutoField(primary_key=True)
@@ -52,16 +51,6 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = ['location_id', 'name', 'location_type', 'address', 'coordinates', 'on_grounds', 'link']
 
 
-def calculate_average_rating(ratings_list):
-    if not ratings_list:
-        return None
-    total_ratings = sum(ratings_list)
-    num_ratings = len(ratings_list)
-    if num_ratings == 0:
-        return None
-    return round(total_ratings / num_ratings, 1)
-
-
 class StudySpace(models.Model):
     # unique identifier for each space entry
     studyspace_id = models.AutoField(primary_key=True)
@@ -83,15 +72,15 @@ class StudySpace(models.Model):
     # comments is where we'll have a list of comments or written reviews. can be thought of as a sort of discussion
     # space each comment will be saved in this list as a tuple in format ("userID", "user's comment here") ex (
     # "user1234", "this place is great!")
-    comments = models.JSONField(default=dict)
+    comments = models.JSONField(default=list)
     reservable = models.BooleanField(default=False)
     capacity = models.PositiveIntegerField()
     # the overall rating for the space as a whole.
     # Each rating (the next 4 fields) will be saved in this list as a  tuple: ("userID", int(rating)) ex ("user1234", 3)
-    overall_ratings = models.JSONField(default=dict)
-    comfort_ratings = models.JSONField(default=dict)
-    noise_level_ratings = models.JSONField(default=dict)
-    crowdedness_ratings = models.JSONField(default=dict)
+    overall_ratings = models.JSONField(default=list)
+    comfort_ratings = models.JSONField(default=list)
+    noise_level_ratings = models.JSONField(default=list)
+    crowdedness_ratings = models.JSONField(default=list)
     # If it is reservable, the link will be to the reserving page (see spreadsheet for these links).
     # If not reservable, this field should probably just stay empty
     link = models.URLField(max_length=200, null=True, blank=True)
@@ -128,6 +117,14 @@ class StudySpace(models.Model):
 
     def calculate_crowdedness_rating(self):
         return calculate_average_rating(self.crowdedness_ratings)
+
+
+def calculate_average_rating(ratings_list):
+    total_ratings = sum(ratings_list)
+    num_ratings = len(ratings_list)
+    if num_ratings == 0:
+        return None
+    return round(total_ratings / num_ratings, 1)
 
 
 class StudySpaceSerializer(serializers.ModelSerializer):
