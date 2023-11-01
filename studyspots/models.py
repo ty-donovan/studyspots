@@ -59,7 +59,7 @@ def calculate_average_rating(ratings_list):
     num_ratings = len(ratings_list)
     if num_ratings == 0:
         return None
-    return total_ratings / num_ratings
+    return round(total_ratings / num_ratings, 1)
 
 
 class StudySpace(models.Model):

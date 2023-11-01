@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="title-text">Review for {{ study_spot.name }}</h2>
+            <form action="{% url 'studyspots:process_review' location_id=location_id study_spot_id=study_spot_id %}" method="post" class="mt-5">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="overall"><p class="form-p"><strong>Overall (1-5):</strong></p></label>
+                    <input type="number" id="overall" name="overall" min="1" max="5" class="form-control" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="comfort"><p class="form-p"><strong>Comfort (1-5):</strong></p></label>
+                    <input type="number" id="comfort" name="comfort" min="1" max="5" class="form-control" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="noise_level"><p class="form-p"><strong>Noise Level (1-5):</strong></p></label>
+                    <input type="number" id="noise_level" name="noise_level" min="1" max="5" class="form-control" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="crowdedness"><p class="form-p"><strong>Crowdedness (1-5):</strong></p></label>
+                    <input type="number" id="crowdedness" name="crowdedness" min="1" max="5" class="form-control" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="comment"><p class="form-p"><strong>Comment:</strong></p></label>
+                    <textarea id="comment" name="comment" class="form-control"></textarea>
+                </div>
+                
+                <input type="submit" value="Submit" class="btn mt-3">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

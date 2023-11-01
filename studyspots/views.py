@@ -87,4 +87,38 @@ def get_studyspace_data(request, location_id, location_ordinal):
     if request.method == "GET" and is_ajax(request):
         location = Location.objects.get(location_id=location_id)
         studyspace_data = StudySpaceSerializer(location.studyspace_set.get(location_ordinal=location_ordinal), many=False).data
-        return JsonResponse(studyspace_data, safe=False)
+    return JsonResponse(studyspace_data, safe=False)
+
+
+# method to render information about a study spot
+def study_spot(request, location_id, study_spot_id):
+    study_spot = StudySpot.objects.get(space_id=study_spot_id)
+  
+    return render(request, 'studyspots/study_spot.html', {'study_spot': study_spot, 'location_id': location_id})
+
+
+# method to render a form to add a review for a study spot
+def review_spot(request, location_id, study_spot_id):
+    study_spot = StudySpot.objects.get(space_id=study_spot_id)
+
+    return render(request, 'studyspots/study_spot_form.html', {'study_spot_id': study_spot_id,
+                                                                'location_id': location_id,
+                                                                'study_spot': study_spot})
+
+
+# method to process a review for a study spot and update database
+def process_review(request, location_id, study_spot_id):
+    if request.method == 'POST':
+        study_spot = StudySpot.objects.get(space_id=study_spot_id)
+        study_spot.overall_ratings.append(int(request.POST['overall']))
+        study_spot.comfort_ratings.append(int(request.POST['comfort']))
+        study_spot.noise_level_ratings.append(int(request.POST['noise_level']))
+        study_spot.crowdedness_ratings.append(int(request.POST['crowdedness']))
+
+        if request.POST['comment'] != "":
+            study_spot.comments.append(request.POST['comment'])
+
+        study_spot.save()
+        return redirect('studyspots:study_spot', location_id=location_id, study_spot_id=study_spot_id)
+    else:
+        return redirect('studyspots:study_spot', location_id=location_id, study_spot_id=study_spot_id)

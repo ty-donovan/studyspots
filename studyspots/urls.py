@@ -12,6 +12,13 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("login/", views.profile, name="login"),
     path("load/", views.load, name="load"),
+
+    path("load/spot/<int:location_id>", views.get_spot_data, name="get_spot_data"),
+    path("map/location<int:location_id>/studyspot<int:study_spot_id>/", views.study_spot, name="study_spot"),
+    path("map/location<int:location_id>/studyspot<int:study_spot_id>/review_spot/", views.review_spot, name="review_spot"),
+    path("map/location<int:location_id>/studyspot<int:study_spot_id>/process_review/", views.process_review, name="process_review")
+  
     path("location_<int:location_id>/space_<int:location_ordinal>/", views.get_studyspace_data, name="get_studyspace_data"),
     path("location_<int:location_id>/", views.get_location_data, name="get_location_data"),
+  
 ]
