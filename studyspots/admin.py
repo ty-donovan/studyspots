@@ -1,6 +1,12 @@
 from django.contrib import admin
 from .models import Location, StudySpace
 
-# Register your models here.
+
+class StudySpaceAdmin(admin.ModelAdmin):
+    exclude = (
+        'location_ordinal', 'comments', 'overall_ratings', 'comfort_ratings', 'noise_level_ratings',
+        'crowdedness_ratings')
+
+
 admin.site.register(Location)
-admin.site.register(StudySpace)
+admin.site.register(StudySpace, StudySpaceAdmin)

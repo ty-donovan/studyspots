@@ -1,5 +1,8 @@
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from rest_framework import serializers
-from django.db import models
+from django.db import models, DEFAULT_DB_ALIAS
+
 
 class Location(models.Model):
     # variable as identifier for each location
@@ -8,11 +11,11 @@ class Location(models.Model):
     # these are the location types that we have as of now, may want to change later. I added a default "Other" to
     # account for buildings/locations such as the Rotunda or a rec center that doesn't fit as nicely into a category
     TYPE_CHOICES = [
-        ('Library', 'Library'),
-        ('Academic Building', 'Academic Building'),
-        ('Outdoor', 'Outdoor'),
-        ('Business', 'Business'),
-        ('Other', 'Other'),
+        ('LIBRARY', 'Library'),
+        ('ACADEMIC_BUILDING', 'Academic Building'),
+        ('OUTDOOR', 'Outdoor'),
+        ('BUSINESS', 'Business'),
+        ('OTHER', 'Other'),
     ]
     location_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Other')
     # the address of the location in written form
@@ -21,7 +24,6 @@ class Location(models.Model):
     lat = models.DecimalField(max_digits=10, decimal_places=7, default=0.0)
     lng = models.DecimalField(max_digits=10, decimal_places=7, default=0.0)
     # see coordinate constructor
-
     # want to support images if this is something we choose to add later. note: this directory does not exist yet
     # image = models.ImageField(upload_to='study_location_images/', null=True, blank=True)
     # We don't have links for any of the buildings rn. Could be nice to give option for businesses to put website.
@@ -44,14 +46,10 @@ class Location(models.Model):
 
 class LocationSerializer(serializers.ModelSerializer):
     coordinates = models.CharField()
+
     class Meta:
         model = Location
         fields = ['location_id', 'name', 'location_type', 'address', 'coordinates', 'on_grounds', 'link']
-
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     data["coordinates"] = f"{data['lat']}, {data['lng']}"
-    #     return data
 
 
 def calculate_average_rating(ratings_list):
@@ -69,6 +67,7 @@ class StudySpace(models.Model):
     studyspace_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
     location_id = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location_ordinal = models.IntegerField(default=-1)
     name = models.CharField(max_length=100)
     # these are all the types I could think of. Might want to add others later
     TYPE_CHOICES = [
@@ -83,18 +82,33 @@ class StudySpace(models.Model):
     # comments is where we'll have a list of comments or written reviews. can be thought of as a sort of discussion
     # space each comment will be saved in this list as a tuple in format ("userID", "user's comment here") ex (
     # "user1234", "this place is great!")
-    comments = models.JSONField(default=list)
+    comments = models.JSONField(default=dict)
     reservable = models.BooleanField(default=False)
     capacity = models.PositiveIntegerField()
     # the overall rating for the space as a whole.
     # Each rating (the next 4 fields) will be saved in this list as a  tuple: ("userID", int(rating)) ex ("user1234", 3)
-    overall_ratings = models.JSONField(default=list)
-    comfort_ratings = models.JSONField(default=list)
-    noise_level_ratings = models.JSONField(default=list)
-    crowdedness_ratings = models.JSONField(default=list)
+    overall_ratings = models.JSONField(default=dict)
+    comfort_ratings = models.JSONField(default=dict)
+    noise_level_ratings = models.JSONField(default=dict)
+    crowdedness_ratings = models.JSONField(default=dict)
     # If it is reservable, the link will be to the reserving page (see spreadsheet for these links).
     # If not reservable, this field should probably just stay empty
     link = models.URLField(max_length=200, null=True, blank=True)
+
+    def set_ordinal(self):
+        count = StudySpace.objects.filter(location_id=self.location_id.pk,
+                                          studyspace_id__lte=self.studyspace_id).count()
+        self.location_ordinal = count
+
+    def save(self, *args, **kwargs):
+        super(StudySpace, self).save(args, kwargs)
+        self.set_ordinal()
+        super(StudySpace, self).save(args, kwargs)
+
+    def refresh_from_db(self, *args, **kwargs):
+        super(StudySpace, self).refresh_from_db(args, kwargs)
+        self.set_ordinal()
+        super(StudySpace, self).refresh_from_db(args, kwargs)
 
     def __str__(self):
         return self.name
@@ -111,8 +125,11 @@ class StudySpace(models.Model):
     def calculate_crowdedness_rating(self):
         return calculate_average_rating(self.crowdedness_ratings)
 
-
 class StudySpaceSerializer(serializers.ModelSerializer):
+    location_ordinal = models.IntegerField()
+
     class Meta:
         model = StudySpace
-        fields = "__all__"
+        fields = ['studyspace_id', 'location_id', 'location_ordinal', 'name', 'TYPE_CHOICES', 'space_type', 'comments',
+                  'reservable', 'capacity', 'overall_ratings', 'comfort_ratings', 'noise_level_ratings',
+                  'crowdedness_ratings', 'link']

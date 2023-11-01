@@ -83,8 +83,8 @@ def get_location_data(request, location_id):
     # render(request, )
 
 
-def get_studyspace_data(request, location_id, studyspace_id):
+def get_studyspace_data(request, location_id, location_ordinal):
     if request.method == "GET" and is_ajax(request):
         location = Location.objects.get(location_id=location_id)
-        studyspace_data = StudySpaceSerializer(location.studyspace_set.get(studyspace_id=studyspace_id), many=True).data
+        studyspace_data = StudySpaceSerializer(location.studyspace_set.get(location_ordinal=location_ordinal), many=False).data
         return JsonResponse(studyspace_data, safe=False)

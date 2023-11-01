@@ -81,26 +81,27 @@ function initMap() {
     });
     marker.addListener("click", ({ domEvent, latLng }) => {
       const { target } = domEvent;
-      infowindow.setContent('');
       infowindow.close();
+      infowindow.setContent(makeWindowContent(location));
       fetchResource(get_location_data_url(location.location_id))
       .then((response) => response.json())
       .then((data) =>{
-      infowindow.setContent('<div>' +
-                '<h3> ' + location.name + '</h3>' +
-                '<h6>' + location.location_type + '</h6>' +
-                '<p>' + location.address + '</p>' +
-                formatPostLinks(data, location))
+      infowindow.setContent(makeWindowContent(location, data))
       }).then(infowindow.open(map, marker));
     });
   })
 }
 
-function formatPostLinks(data, location){
+function makeWindowContent(location, data= null){
+  return '<h3> ' + location.name + '</h3>' +
+         '<h6>' + location.location_type + '</h6>' +
+         '<p>' + location.address + '</p>' + (data == null ? "" : formatPostLinks(location, data))
+}
+
+function formatPostLinks(location, data){
   let output = "";
   data.forEach(function(studyspace){
-    //console.log(data)
-    output += `<a href="${getUrl(get_studyspace_data_url(location.location_id, studyspace.studyspace_id))}"`+
+    output += `<a href="${getUrl(get_studyspace_data_url(location.location_id, studyspace.location_ordinal))}"`+
               `title="${studyspace.space_type}: (fix ratings out of 5)">${studyspace.name}</a><br>`;
   });
   output += '<a href="'+getUrl(get_add_with_location_url(location.location_id))+'">Add a new study spot</a>'
