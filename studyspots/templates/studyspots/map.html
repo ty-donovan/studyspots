@@ -7,6 +7,10 @@
 <script
         src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script>
+    const is_authenticated = '{{ user.is_authenticated }}'==='True';
+    console.log(is_authenticated)
+</script>
+<script>
     const icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
     const locations = [{{locations|safe}}][0];
     const starting_location_id = [{{ location_id }}][0];

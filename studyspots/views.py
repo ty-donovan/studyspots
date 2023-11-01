@@ -69,6 +69,7 @@ def map_redirect(request):
     return redirect(reverse('studyspots:map'), False)
 
 
+@login_required()
 def add(request, location_id=None):
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)

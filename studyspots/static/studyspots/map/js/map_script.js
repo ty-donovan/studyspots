@@ -63,9 +63,11 @@ function initMap() {
         streetViewControl: false,
   });
   const centerControlDiv = document.createElement("div");
-  const addStudySpaceButton = createAddStudySpace(); //creates
-  centerControlDiv.appendChild(addStudySpaceButton);
-  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(addStudySpaceButton);
+  if(is_authenticated){
+    const addStudySpaceButton = createAddStudySpace(); //creates
+    centerControlDiv.appendChild(addStudySpaceButton);
+    map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(addStudySpaceButton);
+  }
   var infowindow = new google.maps.InfoWindow({
      content: ""
    });
