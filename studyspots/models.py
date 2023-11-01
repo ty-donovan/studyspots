@@ -67,6 +67,7 @@ class StudySpace(models.Model):
     studyspace_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
     location_id = models.ForeignKey(Location, on_delete=models.CASCADE)
+    # variable that shows which # the space is of its location. More information at the set_ordinal function desc.
     location_ordinal = models.IntegerField(default=-1)
     name = models.CharField(max_length=100)
     # these are all the types I could think of. Might want to add others later
@@ -95,10 +96,13 @@ class StudySpace(models.Model):
     # If not reservable, this field should probably just stay empty
     link = models.URLField(max_length=200, null=True, blank=True)
 
+    # if the location has 4 items, it's nice to be able to go to each item at a time. Thus, ordinal values per location
+    # location_ordinal holds which number of the location it is, and is set on save or refresh
+    # the necessity to save the parent twice is due to when primary keys are generated.
+    # of the options investigated, it was by far the easiest and most intuitive way to handle it
     def set_ordinal(self):
-        count = StudySpace.objects.filter(location_id=self.location_id.pk,
-                                          studyspace_id__lte=self.studyspace_id).count()
-        self.location_ordinal = count
+        ct = StudySpace.objects.filter(location_id=self.location_id.pk, studyspace_id__lte=self.studyspace_id).count()
+        self.location_ordinal = ct
 
     def save(self, *args, **kwargs):
         super(StudySpace, self).save(args, kwargs)
@@ -125,11 +129,8 @@ class StudySpace(models.Model):
     def calculate_crowdedness_rating(self):
         return calculate_average_rating(self.crowdedness_ratings)
 
-class StudySpaceSerializer(serializers.ModelSerializer):
-    location_ordinal = models.IntegerField()
 
+class StudySpaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudySpace
-        fields = ['studyspace_id', 'location_id', 'location_ordinal', 'name', 'TYPE_CHOICES', 'space_type', 'comments',
-                  'reservable', 'capacity', 'overall_ratings', 'comfort_ratings', 'noise_level_ratings',
-                  'crowdedness_ratings', 'link']
+        fields = "__all__"
