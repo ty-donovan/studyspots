@@ -45,8 +45,8 @@ def profile(request):
 #
 
 
-def index(request):
-    return render(request, 'studyspots/index.html')
+# def index(request):
+#     return render(request, 'studyspots/index.html')
 
 
 def map(request):
@@ -57,6 +57,10 @@ def map(request):
         'key': key, 'locations': locations_json
     }
     return render(request, 'studyspots/map.html', context)
+
+
+def map_redirect(request):
+    return redirect(reverse('studyspots:map'), False)
 
 
 def add(request, location_id=None):

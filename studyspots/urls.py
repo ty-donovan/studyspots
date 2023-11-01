@@ -5,8 +5,9 @@ from . import views
 
 app_name = "studyspots"
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("map/", views.map, name="map"),
+    # path("", views.index, name="index"),
+    path("", views.map, name="map"),
+    path("map/", views.map_redirect, name="map_redirect"),
     path("add/", views.add, name="add"),
     path("add/location_<int:location_id>/", views.add, name="add_with_location"),
     path("logout/", LogoutView.as_view(), name="logout"),
