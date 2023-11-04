@@ -53,17 +53,14 @@ def confirmation(request):
 
 
 def map(request):
+    starting_location_id = request.GET.get('location', None)
     key = settings.GOOGLE_API_KEY
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
     context = {
-        'key': key, 'locations': locations_json
+        'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id
     }
     return render(request, 'studyspots/map.html', context)
-
-
-def map_redirect(request):
-    return redirect(reverse('studyspots:map'), False)
 
 
 @login_required()
