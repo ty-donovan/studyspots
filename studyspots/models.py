@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 class Location(models.Model):
     # variable as identifier for each location
     location_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     # these are the location types that we have as of now, may want to change later. I added a default "Other" to
     # account for buildings/locations such as the Rotunda or a rec center that doesn't fit as nicely into a category
     TYPE_CHOICES = [
@@ -164,7 +164,7 @@ class StudySpace(models.Model):
 
 class PendingStudySpot(models.Model):
     # unique identifier for each space entry
-    space_id = models.AutoField(primary_key=True)
+    studyspace_id = models.AutoField(primary_key=True)
     # variable to associate the space with an existing Location
     # location_id = models.ForeignKey(PendingLocation, on_delete=models.CASCADE)
     content_type = models.ForeignKey(

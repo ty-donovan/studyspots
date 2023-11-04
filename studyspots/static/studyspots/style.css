@@ -1,3 +1,8 @@
+body,
+html {
+  height: 100%;
+}
+
 footer {
     background-color: #003368;
 }
@@ -10,12 +15,20 @@ nav {
     color: white;
 }
 
+/*.navbar{*/
+/*    height: 10vh;*/
+/*}*/
+
+/*.footer{*/
+/*    padding-top: 10px;*/
+/*}*/
+
 .footer-div p {
     color: white;
 }
 
 .mapholder {
-    height: 700px;
+    height: 100%;
     width: 100%;
 }
 
@@ -78,17 +91,18 @@ nav {
         font-size: 3.5rem;
     }
 
-    .main-wrapper {
-        height: 86vh;
-    }
+    /*.main-wrapper {*/
+    /*    display: flex;*/
+    /*    height: 100vh;*/
+    /*    width: 100vw;*/
+    /*}*/
 
-    .mapholder {
-        height: 80vh;
-        width: 95vw;
-    }
+    /*.mapholder {*/
+    /*    height: 80vh;*/
+    /*    width: 95vw;*/
+    /*}*/
     
     #map {
-        height: 80vh;
     }
 
     .comment-list {

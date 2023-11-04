@@ -1,75 +1,138 @@
 {% extends 'base.html' %}
-
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 <script>
-    const locations = [{{locations|safe}}][0];
+    const makeNewLocationLabel = "{{ make_new_location_label|safe }}";
+    let locations = [{{ locations|safe }}][0];
     locations.sort((a, b) => a.name.localeCompare(b.name));
-    console.log(locations)
+    locations.push({location_id: -1, name: makeNewLocationLabel})
 </script>
-<div class="container mt-5">
-    <h4>Select an option:</h4>
-    <form method="post">
-        {% csrf_token %}
-
-        <div class="d-grid gap-2 col-6 mx-auto mt-4">
-            <button type="button" id="existing-location-button" class="btn btn-primary btn-lg" onclick="showExistingLocationDropdown()">Within an existing location</button>
-        </div>
-        <div id="existing-location-dropdown" style="display: none;" class="my-3">
-            <div class="col-6 mx-auto">
-                <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
-                    <option value="" disabled selected>Select an existing location</option>
-                    <script>
-                        // Access the `locations` variable
-                        locations.forEach(function(location) {
-                            document.write(`<option value="${location.location_id}">${location.name}</option>`);
-                        });
-                    </script>
-                </select>
+<body style="">
+    <div class="container mt-5">
+        <form method="post">
+            {% csrf_token %}
+            <div id="existing-location-dropdown" style="display: block;" class="my-3">
+                <h3 id="location-dropdown-title">Choose Location:</h3>
+                <div class="col-6 mx-auto">
+                    <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
+                        <option value="" disabled selected>Select an existing location</option>
+                        <script>
+                            // Access the `locations` variable
+                            locations.forEach(function(location) {
+                                document.write(`<option value="${location.location_id}">${location.name}</option>`);
+                            });
+                        </script>
+                    </select>
+                </div>
             </div>
-        </div>
-        <button type="submit" id="add-button" class="btn btn-success btn-med mx-auto" style="display: none" disabled>Add within this location</button>
-        <div class="d-grid gap-2 col-6 mx-auto mt-3">
-            <a href="{% url 'studyspots:addNewLocation' %}" class="btn btn-primary btn-lg">Not Within an Existing Location</a>
-        </div>
+            <div id="new-location-form" style="display: none">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Add Location Section -->
+                            <h3>Add Location:</h3>
+                            <div id="map" style="width: 100%; height: 400px;"></div>
+                            <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
+                            <div class="mb-3">
+                                {{ new_location_form.locationName.label_tag }}{% if new_location_form.locationName.field.required %}<span class="text-danger">*</span>{% endif %}
+                                {{ new_location_form.locationName }}
+                            </div>
+                            <div class="mb-3">
+                                {{ new_location_form.location_type.label_tag }}{% if new_location_form.location_type.field.required %}<span class="text-danger">*</span>{% endif %}
+                                {{ new_location_form.location_type }}
+                            </div>
+                            <div class="mb-3">
+                                {{ new_location_form.on_grounds.label_tag }}
+                                {{ new_location_form.on_grounds }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <!-- Add Spot Section -->
+                    <h3>Add Spot:</h3>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.spotName.label_tag }}{% if new_studyspace_form.spotName.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.spotName }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.capacity.label_tag }}{% if new_studyspace_form.capacity.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.capacity }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.comment.label_tag }}
+                        {{ new_studyspace_form.comment }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.overall_rating.label_tag }}{% if new_studyspace_form.overall_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.overall_rating }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.comfort_rating.label_tag }}{% if new_studyspace_form.comfort_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.comfort_rating }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.noise_level_rating.label_tag }}{% if new_studyspace_form.noise_level_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.noise_level_rating }}
+                    </div>
+                    <div class="mb-3">
+                        {{ new_studyspace_form.crowdedness_rating.label_tag }}{% if new_studyspace_form.crowdedness_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                        {{ new_studyspace_form.crowdedness_rating }}
+                    </div>
+                    <div class="text-center">
+                        <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
+                    </div>
+                    {% if error_message %}
+                        <p class="text-danger mt-3">{{ error_message }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <script>
+               // var addLocationButton = document.getElementById('add-button');
+                var locationSelect = document.getElementById('existing-location-select');
+                var newLocationForm = document.getElementById('new-location-form');
+                locationSelect.addEventListener('change', function() {
+                    if(locationSelect.value === '-1'){
+                        newLocationForm.style.display = 'block';
+                    }else{
+                        newLocationForm.style.display = 'none';
+                    }
+                });
+            </script>
+            <script>
+                var map;
+                var marker;
 
-        <script>
-            function showExistingLocationDropdown() {
-                var dropdown = document.getElementById('existing-location-dropdown');
-                var button = document.getElementById('existing-location-button');
-                var addButton = document.getElementById('add-button');
-                if (dropdown.style.display === 'none') {
-                    dropdown.style.display = 'block';
-                    addButton.style.display = 'block';
-                } else {
-                    dropdown.style.display = 'none';
-                    addButton.style.display = 'none';
+                function initMap() {
+                    var initialLocation = { lat: 38.0356, lng: -78.5034 }; // Default initial location (University of Virginia)
+                    map = new google.maps.Map(document.getElementById("map"), {
+                          center: initialLocation,
+                          zoom: 17,
+                    });
+                    // Create a draggable marker
+                    marker = new google.maps.Marker({
+                        position: initialLocation,
+                        map: map,
+                        draggable: true
+                    });
+
+                    // Add an event listener to update the coordinates fields when the marker is dragged
+                    google.maps.event.addListener(marker, 'dragend', function () {
+                        var coordinates = marker.getPosition();
+                        document.getElementById("id_lat").value = coordinates.lat();
+                        document.getElementById("id_lng").value = coordinates.lng();
+                    });
                 }
-            }
+                initMap()
+            </script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=places&callback=initMap"></script>
 
-            var addLocationButton = document.getElementById('add-button');
-            var locationSelect = document.getElementById('existing-location-select');
-
-            locationSelect.addEventListener('change', function() {
-                if (locationSelect.value) {
-                    addLocationButton.classList.remove('disabled');
-                    addLocationButton.disabled = false;
-                } else {
-                    addLocationButton.classList.add('disabled');
-                    addLocationButton.disabled = true;
-                }
-            });
-
-            addLocationButton.addEventListener('click', function() {
-                var selectedLocation = locationSelect.value;
-                if (selectedLocation) {
-                    window.location.href = "{% url 'studyspots:add_new_spot' 0 %}".replace('0', selectedLocation);
-                }
-            });
-        </script>
-    </form>
-</div>
+        </form>
+    </div>
+</body>
 {% endblock %}
 
 

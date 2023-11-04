@@ -28,14 +28,14 @@
 <script src="{% static 'studyspots/map/js/map_script.js' %}"></script>
 
 
-<div class="container-fluid">
-    <div class="row">
+<div class="col container-fluid">
+    <div class="row h-100  d-flex">
         <div class="col-md-4 d-none d-lg-block">
             <div class="content-box">
-                
+
             </div>
         </div>
-        <div class="col-md-8 col-12">
+        <div class="col-md-8 d-lg-block flex-grow-1">
             <div class="mapholder">
                 <div id="map"></div>
                 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=core,maps,marker&callback=initMap">

@@ -1,4 +1,6 @@
 from django import forms
+from django.shortcuts import render
+
 from .models import Location
 
 TYPE_CHOICES = [
@@ -19,11 +21,12 @@ RATING_CHOICES = [
 
 
 class SelectExistingLocationForm(forms.Form):
+    queryset = Location.objects.all()
     existing_location = forms.ModelChoiceField(
-        queryset=Location.objects.order_by('name'),
+        queryset=queryset,
         label='Select an existing location',
         empty_label='Select a location',
-        required=False
+        required=True,
     )
 
 
@@ -52,50 +55,12 @@ class NewLocationForm(forms.Form):
         widget=forms.HiddenInput(attrs={'class': 'form-control'}),
         required=True  # Mark the field as required
     )
-    # These are the fields to add a spot
-
-    spotName = forms.CharField(
-        label='Name of Spot',
-        max_length=100,
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        required=True  # Mark the field as required
-    )
-    capacity = forms.IntegerField(
-        label='Capacity',
-        widget=forms.NumberInput(attrs={'class': 'form-control'}),
-        max_value=1000,
-        required=True  # Mark the field as required
-    )
-    comment = forms.CharField(
-        widget=forms.Textarea(
-            attrs={'class': 'form-control', 'placeholder': 'Add a description or comment about this spot!'})
-        ,
-        required=False
-    )
-    overall_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        required=True  # Mark the field as required
-    )
-    comfort_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        required=True  # Mark the field as required
-    )
-    noise_level_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        required=True  # Mark the field as required
-    )
-    crowdedness_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        required=True  # Mark the field as required
-    )
 
 
-class ExistingLocationForm(forms.Form):
-    spotName = forms.CharField(
+class NewStudySpaceForm(forms.Form):
+
+    location = SelectExistingLocationForm()
+    studySpaceName = forms.CharField(
         label='Name of Spot',
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control'}),

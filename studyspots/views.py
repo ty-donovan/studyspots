@@ -4,10 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import json
 import geopy.distance
-from .forms import NewLocationForm
-from .forms import ExistingLocationForm
-from .models import Location
-from .forms import SelectExistingLocationForm
+from .forms import *
 
 from django.urls import reverse
 
@@ -72,119 +69,77 @@ def map_redirect(request):
 @login_required()
 def add(request, location_id=None):
     locations = LocationSerializer(Location.objects.all(), many=True).data
+    new_location_label = "-- Add new location --"
+    # return JsonResponse(locations, safe=False)
     locations_json = json.dumps(locations)
-    if request.method == 'POST':
-        existing_location_form = SelectExistingLocationForm(request.POST)
-
-        if existing_location_form.is_valid():
-            selected_location = existing_location_form.cleaned_data['existing_location']
-
-            # Redirect to the "addSpot" URL with the selected location's ID
-            if selected_location:
-                location_id = selected_location.location_id
-                return redirect('studyspots:addNewSpot', location_id=location_id)
-
-    else:
-        existing_location_form = SelectExistingLocationForm()
-    context = {
-        'locations': locations_json,
-        'existing_location_form': existing_location_form,
-    }
-    return render(request, 'studyspots/add.html', context)
-
-
-def non_existing_location(request):
     key = settings.GOOGLE_API_KEY
     error_message = None
-
+    new_location_form = NewLocationForm()
+    select_location_form = SelectExistingLocationForm()
+    new_studyspace_form = NewStudySpaceForm()
+    location_id = None
     if request.method == 'POST':
-        form = NewLocationForm(request.POST)
-        if form.is_valid():
-            # Get the coordinates from the form
-            lat = form.cleaned_data['lat']
-            lng = form.cleaned_data['lng']
-
-            # Check if the location is within a 10-mile radius of the University of Virginia
-            location_point = (lat, lng)
-            uva_point = (38.0356, -78.5034)  # UVA coordinates
-            distance = geopy.distance.distance(uva_point, location_point).miles
-
-            if distance <= 10:
-                # Location is within the 10-mile radius, proceed to save
-                location = PendingLocation(
-                    name=form.cleaned_data['locationName'],
-                    location_type=form.cleaned_data['location_type'],
-                    on_grounds=form.cleaned_data['on_grounds'],
-                    lat=lat,
-                    lng=lng,
-                )
-                location.save()
-
-                spot = PendingStudySpot(
-                    content_type=ContentType.objects.get_for_model(location),
-                    object_id=location.pk,
-                    name=form.cleaned_data['spotName'],
-                    capacity=form.cleaned_data['capacity'],
-                    comments=[form.cleaned_data['comment']],
-                    overall_ratings=[form.cleaned_data['overall_rating']],
-                    comfort_ratings=[form.cleaned_data['comfort_rating']],
-                    noise_level_ratings=[form.cleaned_data['noise_level_rating']],
-                    crowdedness_ratings=[form.cleaned_data['crowdedness_rating']],
-                )
-                spot.save()
-
-                # Redirect to map page or any other desired action
-                return redirect("../../confirmation")
-            else:
-                # Location is outside the 10-mile radius
-                error_message = "Location must be closer to the University of Virginia."
+        select_location_form = SelectExistingLocationForm(request.POST)
+        if select_location_form.is_valid():
+            selected_location = select_location_form.cleaned_data['existing_location']
+            if selected_location:
+                location_id = selected_location.location_id
         else:
-            error_message = "Invalid form data: you must move the pin from it's original position"
-    else:
-        form = NewLocationForm()
+            new_location_form = NewLocationForm(request.POST)
+            if new_location_form.is_valid():
+                # Get the coordinates from the form
+                lat = new_location_form.cleaned_data['lat']
+                lng = new_location_form.cleaned_data['lng']
 
-    context = {
-        'key': key,
-        'form': form,
-        'error_message': error_message,
-    }
+                # Check if the location is within a 10-mile radius of the University of Virginia
+                location_point = (lat, lng)
+                uva_point = (38.0356, -78.5034)  # UVA coordinates
+                distance = geopy.distance.distance(uva_point, location_point).miles
 
-    return render(request, 'studyspots/addNewLocation.html', context)
-
-
-def add_new_spot(request, location_id):
-    error_message = None
-
-    if request.method == 'POST':
-        form = ExistingLocationForm(request.POST)
-        if form.is_valid():
+                if distance <= 10:
+                    # Location is within the 10-mile radius, proceed to save
+                    location = PendingLocation(
+                        name=new_location_form.cleaned_data['locationName'],
+                        location_type=new_location_form.cleaned_data['location_type'],
+                        on_grounds=new_location_form.cleaned_data['on_grounds'],
+                        lat=lat,
+                        lng=lng,
+                    )
+                    location.save()
+                    location_id = location.location_id
+                else:
+                    # Location is outside the 10-mile radius
+                    error_message = "Location must be closer to the University of Virginia."
+            else:
+                error_message = "Invalid form data: you must move the pin from it's original position"
+        new_studyspace_form = NewStudySpaceForm(request.POST)
+        if new_studyspace_form.is_valid():
             location = Location.objects.get(pk=location_id)
             spot = PendingStudySpot(
                 content_type=ContentType.objects.get_for_model(location),
                 object_id=location.pk,
-                name=form.cleaned_data['spotName'],
-                capacity=form.cleaned_data['capacity'],
-                comments=[form.cleaned_data['comment']],
-                overall_ratings=[form.cleaned_data['overall_rating']],
-                comfort_ratings=[form.cleaned_data['comfort_rating']],
-                noise_level_ratings=[form.cleaned_data['noise_level_rating']],
-                crowdedness_ratings=[form.cleaned_data['crowdedness_rating']],
+                name=new_studyspace_form.cleaned_data['spotName'],
+                capacity=new_studyspace_form.cleaned_data['capacity'],
+                comments=[new_studyspace_form.cleaned_data['comment']],
+                overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
+                comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
+                noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
+                crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
             )
             spot.save()
-
-            # Redirect to map page or any other desired action
-            return redirect("../../confirmation")
         else:
-            error_message = "Invalid form data."
-    else:
-        form = ExistingLocationForm()
-
+            error_message = "Invalid Study Spot data."
+        return redirect("../../confirmation")
     context = {
-        'form': form,
+        'locations': locations_json,
+        'make_new_location_label': new_location_label,
+        'key': key,
+        'select_location_form': select_location_form,
+        'new_location_form': new_location_form,
+        'new_studyspace_form': new_studyspace_form,
         'error_message': error_message,
     }
-
-    return render(request, 'studyspots/addNewSpot.html', context)
+    return render(request, 'studyspots/add.html', context)
 
 
 # Add all the locations from the file to database. Do not use.
