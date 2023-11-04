@@ -8,29 +8,34 @@
     locations.sort((a, b) => a.name.localeCompare(b.name));
     locations.push({location_id: -1, name: makeNewLocationLabel})
 </script>
-<body style="">
+<body>
     <div class="container mt-5">
         <form method="post">
             {% csrf_token %}
             <div id="existing-location-dropdown" style="display: block;" class="my-3">
-                <h3 id="location-dropdown-title">Choose Location:</h3>
-                <div class="col-6 mx-auto">
-                    <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
-                        <option value="" disabled selected>Select an existing location</option>
-                        <script>
-                            // Access the `locations` variable
-                            locations.forEach(function(location) {
-                                document.write(`<option value="${location.location_id}">${location.name}</option>`);
-                            });
-                        </script>
-                    </select>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h3>Choose Location:</h3>
+                            <div class="col-6 mx-auto">
+                                <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
+                                    <option value="" disabled selected>Select an existing location</option>
+                                    <script>
+                                        // Access the `locations` variable
+                                        locations.forEach(function(location) {
+                                            document.write(`<option value="${location.location_id}">${location.name}</option>`);
+                                        });
+                                    </script>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="new-location-form" style="display: none">
                 <div class="container">
                     <div class="row">
                         <div class="col">
-                            <!-- Add Location Section -->
                             <h3>Add Location:</h3>
                             <div id="map" style="width: 100%; height: 400px;"></div>
                             <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
@@ -50,44 +55,46 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <!-- Add Spot Section -->
-                    <h3>Add Spot:</h3>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.spotName.label_tag }}{% if new_studyspace_form.spotName.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.spotName }}
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <!-- Add Spot Section -->
+                        <h3>Add Spot:</h3>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.spotName.label_tag }}{% if new_studyspace_form.spotName.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.spotName }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.capacity.label_tag }}{% if new_studyspace_form.capacity.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.capacity }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.comment.label_tag }}
+                            {{ new_studyspace_form.comment }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.overall_rating.label_tag }}{% if new_studyspace_form.overall_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.overall_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.comfort_rating.label_tag }}{% if new_studyspace_form.comfort_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.comfort_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.noise_level_rating.label_tag }}{% if new_studyspace_form.noise_level_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.noise_level_rating }}
+                        </div>
+                        <div class="mb-3">
+                            {{ new_studyspace_form.crowdedness_rating.label_tag }}{% if new_studyspace_form.crowdedness_rating.field.required %}<span class="text-danger">*</span>{% endif %}
+                            {{ new_studyspace_form.crowdedness_rating }}
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
+                        </div>
+                        {% if error_message %}
+                            <p class="text-danger mt-3">{{ error_message }}</p>
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.capacity.label_tag }}{% if new_studyspace_form.capacity.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.capacity }}
-                    </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.comment.label_tag }}
-                        {{ new_studyspace_form.comment }}
-                    </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.overall_rating.label_tag }}{% if new_studyspace_form.overall_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.overall_rating }}
-                    </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.comfort_rating.label_tag }}{% if new_studyspace_form.comfort_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.comfort_rating }}
-                    </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.noise_level_rating.label_tag }}{% if new_studyspace_form.noise_level_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.noise_level_rating }}
-                    </div>
-                    <div class="mb-3">
-                        {{ new_studyspace_form.crowdedness_rating.label_tag }}{% if new_studyspace_form.crowdedness_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                        {{ new_studyspace_form.crowdedness_rating }}
-                    </div>
-                    <div class="text-center">
-                        <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
-                    </div>
-                    {% if error_message %}
-                        <p class="text-danger mt-3">{{ error_message }}</p>
-                    {% endif %}
                 </div>
             </div>
             <script>

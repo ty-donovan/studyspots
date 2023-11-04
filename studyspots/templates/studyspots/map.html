@@ -9,11 +9,9 @@
 <script>
     const is_authenticated = '{{ user.is_authenticated }}'==='True';
     console.log(is_authenticated)
-</script>
-<script>
-    const icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
-    const locations = [{{locations|safe}}][0];
-    const starting_location_id = [{{ location_id }}][0];
+    const add_studyspot_icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
+    const home_icon = "{% static 'studyspots/map/img/go-home.svg' %}"
+    const starting_location_id = [{{ starting_location_id }}][0];
     function get_location_data_url(location_id){
         return "{% url 'studyspots:get_location_data' 100543 %}".replace("100543", location_id);
     }
@@ -25,6 +23,7 @@
     }
     const map_url = "{% url 'studyspots:map'%}"
 </script>
+<script> const locations = [{{locations|safe}}][0]; </script>
 <script src="{% static 'studyspots/map/js/map_script.js' %}"></script>
 
 
