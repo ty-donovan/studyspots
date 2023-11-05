@@ -89,30 +89,32 @@ def add(request):
                     error_message = "Location must be closer to the University of Virginia."
             else:
                 error_message = "Invalid form data: you must move the pin from its original position"
-        if location_id != -1 or pending_location_id:
-            new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
-            if new_studyspace_form.is_valid():
-                print(f'{location_id},{pending_location_id}')
-                if pending_location_id:
-                    pending_location = PendingLocation.objects.get(pk=pending_location_id)
-                else:
-                    pending_location = Location.objects.get(pk=location_id)
-                pending_space = PendingStudySpace(
-                    content_type=ContentType.objects.get_for_model(pending_location),
-                    object_id=pending_location.pk,
-                    name=new_studyspace_form.cleaned_data['studySpaceName'],
-                    capacity=new_studyspace_form.cleaned_data['capacity'],
-                    comments=[new_studyspace_form.cleaned_data['comment']],
-                    overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
-                    comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
-                    noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
-                    crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
-                )
-                pending_space.save()
+        new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
+        print(type(new_studyspace_form.cleaned_data['capacity']))
+        if new_studyspace_form.is_valid() and new_studyspace_form.cleaned_data['capacity'] > 0:
+            if pending_location_id:
+                pending_location = PendingLocation.objects.get(pk=pending_location_id)
             else:
-                error_message = "Invalid Study Spot data."
+                pending_location = Location.objects.get(pk=location_id)
+            pending_space = PendingStudySpace(
+                content_type=ContentType.objects.get_for_model(pending_location),
+                object_id=pending_location.pk,
+                name=new_studyspace_form.cleaned_data['studySpaceName'],
+                capacity=new_studyspace_form.cleaned_data['capacity'],
+                comments=[new_studyspace_form.cleaned_data['comment']],
+                overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
+                comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
+                noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
+                crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
+            )
+            pending_space.save()
             return redirect(reverse("studyspots:confirmation"))
         else:
+            if new_studyspace_form.cleaned_data['capacity'] < 1:
+                error_message = "Invalid capacity number"
+                new_studyspace_form.cleaned_data['capacity'] = 1
+            else:
+                error_message = "Invalid study spot data"
             context = {
                 'starting_location': location_id,
                 'locations': locations_json,
@@ -125,8 +127,9 @@ def add(request):
     else:
         new_location_form = NewLocationForm(prefix="new_location")
         new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
+        location_id = request.GET.get('location', None)
     context = {
-        'starting_location': request.GET.get('location', None),
+        'starting_location': location_id,
         'locations': locations_json,
         'make_new_location_label': new_location_label,
         'key': key,

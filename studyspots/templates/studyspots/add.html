@@ -67,6 +67,7 @@
                         <div class="text-center">
                             <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
                         </div>
+                        <p class="text-danger mt-3">{{ error_message }}</p>
                         {% if error_message %}
                             <p class="text-danger mt-3">{{ error_message }}</p>
                         {% endif %}
@@ -91,7 +92,6 @@
                         initMap()
                     }else{
                         newLocationForm.style.display = 'none';
-                        newLocationForm.innerHTML = '';
                         requiredLocationField.required = false;
                     }
                 }

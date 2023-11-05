@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -5,6 +6,7 @@ from rest_framework import serializers
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+
 
 
 class Location(models.Model):
@@ -35,6 +37,7 @@ class Location(models.Model):
     # this url based on the coordinates/address)
     # this variable tells whether the building is on grounds or not. note: the prepopulated ones will all be set to true
     on_grounds = models.BooleanField(default=False)
+
     # link = models.URLField(max_length=200, null=True, blank=True, default=None)
 
     @property
@@ -219,8 +222,6 @@ def calculate_average_rating(ratings_list):
     return round(total_ratings / num_ratings, 1)
 
 
-
-
 class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=False)
@@ -232,4 +233,12 @@ class Admin(models.Model):
 
     @receiver(post_save, sender=User)
     def save_user_model(sender, instance, **kwargs):
+        print(instance)
         instance.admin.save()
+
+    @property
+    @admin.display(
+        description="Username",
+    )
+    def username(obj):
+        return obj.user.username
