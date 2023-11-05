@@ -105,7 +105,6 @@ def add(request):
             else:
                 error_message = "Invalid form data: you must move the pin from its original position"
         new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
-        print(type(new_studyspace_form.cleaned_data['capacity']))
         if new_studyspace_form.is_valid() and new_studyspace_form.cleaned_data['capacity'] > 0:
             if pending_location_id:
                 pending_location = PendingLocation.objects.get(pk=pending_location_id)
