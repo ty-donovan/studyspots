@@ -18,9 +18,6 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-    {#                        <li class="nav-item">#}
-    {#                            <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:index' %}">Home</a>#}
-    {#                        </li>#}
                             <li class="nav-item">
                                 <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:map' %}">Map</a>
                             </li>
@@ -30,6 +27,11 @@
                                 <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:add' %}">Add New Spot</a>
                             </li>
                             {% endif %}
+                            {% if user.admin.is_admin %}
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:review' %}">Review Pending Spots</a>
+                                </li>
+                            {% endif %}
                             <li class="nav-item">
                                 {% load socialaccount %}
                                 {% if user.is_authenticated %}
@@ -38,6 +40,7 @@
                                 <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% provider_login_url "google" method="oauth2" %}">Login</a>
                                 {% endif %}
                             </li>
+
                         </ul>
                     </div>
                 </div>

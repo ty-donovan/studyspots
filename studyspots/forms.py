@@ -20,14 +20,14 @@ RATING_CHOICES = [
 ]
 
 
-class SelectExistingLocationForm(forms.Form):
-    queryset = Location.objects.all()
-    existing_location = forms.ModelChoiceField(
-        queryset=queryset,
-        label='Select an existing location',
-        empty_label='Select a location',
-        required=True,
-    )
+# class SelectExistingLocationForm(forms.Form):
+#     existing_locations = forms.ModelChoiceField(
+#         queryset=Location.objects.all(),
+#         to_field_name='name',
+#         label='Select an existing location',
+#         empty_label='Select a location',
+#         required=True
+#     )
 
 
 class NewLocationForm(forms.Form):
@@ -58,8 +58,6 @@ class NewLocationForm(forms.Form):
 
 
 class NewStudySpaceForm(forms.Form):
-
-    location = SelectExistingLocationForm()
     studySpaceName = forms.CharField(
         label='Name of Spot',
         max_length=100,
@@ -98,3 +96,6 @@ class NewStudySpaceForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
+
+    def __int__(self, value, *args, **kwargs):
+        self.location = (value)

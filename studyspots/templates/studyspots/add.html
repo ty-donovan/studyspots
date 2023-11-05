@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+{% load bootstrap5 %}
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 <script>
+    {%  if starting_location %}
+    const startingLocation = [{{ starting_location }}][0];
+    {% endif %}
     const makeNewLocationLabel = "{{ make_new_location_label|safe }}";
     let locations = [{{ locations|safe }}][0];
     locations.sort((a, b) => a.name.localeCompare(b.name));
@@ -19,12 +23,23 @@
                             <h3>Choose Location:</h3>
                             <div class="col-6 mx-auto">
                                 <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
-                                    <option value="" disabled selected>Select an existing location</option>
+                                    <option id="defaultOption" value="" disabled selected>Select an existing location</option>
                                     <script>
+                                        {% if starting_location %}
+                                        let defaultOption = document.getElementById('defaultOption');
+                                        defaultOption.selected = false;
+                                        {% endif %}
                                         // Access the `locations` variable
                                         locations.forEach(function(location) {
-                                            document.write(`<option value="${location.location_id}">${location.name}</option>`);
+                                            let selectHTML = `<option value="${location.location_id}">${location.name}</option>`
+                                            {% if starting_location %}
+                                            if(location.location_id === startingLocation){
+                                                selectHTML = `<option value="${location.location_id}" selected>${location.name}</option>`
+                                            }
+                                            {% endif %}
+                                            document.write(selectHTML);
                                         });
+
                                     </script>
                                 </select>
                             </div>
@@ -32,62 +47,23 @@
                     </div>
                 </div>
             </div>
-            <div id="new-location-form" style="display: none">
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                            <h3>Add Location:</h3>
-                            <div id="map" style="width: 100%; height: 400px;"></div>
-                            <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
-                            <div class="mb-3">
-                                {{ new_location_form.locationName.label_tag }}{% if new_location_form.locationName.field.required %}<span class="text-danger">*</span>{% endif %}
-                                {{ new_location_form.locationName }}
-                            </div>
-                            <div class="mb-3">
-                                {{ new_location_form.location_type.label_tag }}{% if new_location_form.location_type.field.required %}<span class="text-danger">*</span>{% endif %}
-                                {{ new_location_form.location_type }}
-                            </div>
-                            <div class="mb-3">
-                                {{ new_location_form.on_grounds.label_tag }}
-                                {{ new_location_form.on_grounds }}
-                            </div>
-                        </div>
+        <div id="new-location-form" style="display: none">
+             <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h3>Add Location:</h3>
+                        <div id="map" style="width: 100%; height: 400px;"></div>
+                        <p class="text-muted mt-3">Drag the pin to your desired location on the map.</p>
+                        {% bootstrap_form new_location_form %}
                     </div>
                 </div>
             </div>
+        </div>
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <!-- Add Spot Section -->
                         <h3>Add Spot:</h3>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.spotName.label_tag }}{% if new_studyspace_form.spotName.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.spotName }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.capacity.label_tag }}{% if new_studyspace_form.capacity.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.capacity }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.comment.label_tag }}
-                            {{ new_studyspace_form.comment }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.overall_rating.label_tag }}{% if new_studyspace_form.overall_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.overall_rating }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.comfort_rating.label_tag }}{% if new_studyspace_form.comfort_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.comfort_rating }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.noise_level_rating.label_tag }}{% if new_studyspace_form.noise_level_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.noise_level_rating }}
-                        </div>
-                        <div class="mb-3">
-                            {{ new_studyspace_form.crowdedness_rating.label_tag }}{% if new_studyspace_form.crowdedness_rating.field.required %}<span class="text-danger">*</span>{% endif %}
-                            {{ new_studyspace_form.crowdedness_rating }}
-                        </div>
+                        {% bootstrap_form new_studyspace_form %}
                         <div class="text-center">
                             <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
                         </div>
@@ -98,21 +74,40 @@
                 </div>
             </div>
             <script>
-               // var addLocationButton = document.getElementById('add-button');
-                var locationSelect = document.getElementById('existing-location-select');
-                var newLocationForm = document.getElementById('new-location-form');
+                let locationSelect = document.getElementById('existing-location-select');
+                let newLocationForm = document.getElementById('new-location-form');
+                let requiredLocationField = document.getElementById('id_new_location-locationName');
                 locationSelect.addEventListener('change', function() {
                     if(locationSelect.value === '-1'){
-                        newLocationForm.style.display = 'block';
+                        toggleLocationForm(true);
                     }else{
-                        newLocationForm.style.display = 'none';
+                        toggleLocationForm(false);
                     }
                 });
+                function toggleLocationForm(on){
+                    if(on){
+                        newLocationForm.style.display = 'block';
+                        requiredLocationField.required = true;
+                        initMap()
+                    }else{
+                        newLocationForm.style.display = 'none';
+                        newLocationForm.innerHTML = '';
+                        requiredLocationField.required = false;
+                    }
+                }
             </script>
             <script>
-                var map;
-                var marker;
-
+                let map;
+                let marker;
+                function callback(){
+                    {% if starting_location %}
+                        if(startingLocation === -1){
+                            toggleLocationForm(true);
+                        }else{
+                            toggleLocationForm(false);
+                        }
+                    {% endif %}
+                }
                 function initMap() {
                     var initialLocation = { lat: 38.0356, lng: -78.5034 }; // Default initial location (University of Virginia)
                     map = new google.maps.Map(document.getElementById("map"), {
@@ -129,13 +124,12 @@
                     // Add an event listener to update the coordinates fields when the marker is dragged
                     google.maps.event.addListener(marker, 'dragend', function () {
                         var coordinates = marker.getPosition();
-                        document.getElementById("id_lat").value = coordinates.lat();
-                        document.getElementById("id_lng").value = coordinates.lng();
+                        document.getElementById("id_new_location-lat").value = coordinates.lat();
+                        document.getElementById("id_new_location-lng").value = coordinates.lng();
                     });
                 }
-                initMap()
             </script>
-            <script src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=places&callback=initMap"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=places&callback=callback"></script>
 
         </form>
     </div>

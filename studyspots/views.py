@@ -1,9 +1,13 @@
+from collections import OrderedDict
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import json
 import geopy.distance
+from rest_framework.utils.serializer_helpers import ReturnList
+
 from .forms import *
 
 from django.urls import reverse
@@ -21,32 +25,8 @@ def get_studyspace_by_ordinal(location_id, location_ordinal):
 
 @login_required
 def profile(request):
-    if request.user.is_staff:
-        return render(request, 'studyspots/welcome/admin.html', {'username': request.user.username})
-    else:
-        return render(request, 'studyspots/welcome/user.html', {'username': request.user.username})
+    return redirect(reverse('studyspots:map'), False)
 
-
-#
-# @login_required
-# def welcome_admin(request):
-#     if request.user.user_role == 'admin':
-#         return render(request, 'studyspots/welcome/admin.html', {'username': request.user.username})
-#     else:
-#         return render(request, 'studyspots/welcome/user.html', {'username': request.user.username})
-#
-#
-# @login_required
-# def welcome_user(request):
-#     if request.user.user_role == 'user':
-#         return render(request, 'studyspots/welcome/user.html', {'username': request.user.username})
-#     else:
-#         return render(request, 'studyspots/welcome/admin.html', {'username': request.user.username})
-#
-
-
-# def index(request):
-#     return render(request, 'studyspots/index.html')
 
 def confirmation(request):
     return render(request, 'studyspots/confirmation.html')
@@ -64,25 +44,25 @@ def map(request):
 
 
 @login_required()
-def add(request, location_id=None):
+def add(request):
+    new_location_form, new_studyspace_form = None, None
     locations = LocationSerializer(Location.objects.all(), many=True).data
     new_location_label = "-- Add new location --"
-    # return JsonResponse(locations, safe=False)
     locations_json = json.dumps(locations)
     key = settings.GOOGLE_API_KEY
     error_message = None
-    new_location_form = NewLocationForm()
-    select_location_form = SelectExistingLocationForm()
-    new_studyspace_form = NewStudySpaceForm()
-    location_id = None
+    # new_studyspace_form.location_form.initial = Location.objects.get(location_id=location_id)
     if request.method == 'POST':
-        select_location_form = SelectExistingLocationForm(request.POST)
-        if select_location_form.is_valid():
-            selected_location = select_location_form.cleaned_data['existing_location']
-            if selected_location:
-                location_id = selected_location.location_id
+        print(request.POST)
+        selected_location = request.POST['existing_location']
+        print(selected_location)
+        pending_location_id = None
+        if selected_location:
+            location_id = int(selected_location)
         else:
-            new_location_form = NewLocationForm(request.POST)
+            location_id = -1
+        if location_id == -1:
+            new_location_form = NewLocationForm(request.POST, prefix="new_location")
             if new_location_form.is_valid():
                 # Get the coordinates from the form
                 lat = new_location_form.cleaned_data['lat']
@@ -95,43 +75,61 @@ def add(request, location_id=None):
 
                 if distance <= 10:
                     # Location is within the 10-mile radius, proceed to save
-                    location = PendingLocation(
+                    pending_location = PendingLocation(
                         name=new_location_form.cleaned_data['locationName'],
                         location_type=new_location_form.cleaned_data['location_type'],
                         on_grounds=new_location_form.cleaned_data['on_grounds'],
                         lat=lat,
                         lng=lng,
                     )
-                    location.save()
-                    location_id = location.location_id
+                    pending_location.save()
+                    pending_location_id = pending_location.location_id
                 else:
                     # Location is outside the 10-mile radius
                     error_message = "Location must be closer to the University of Virginia."
             else:
-                error_message = "Invalid form data: you must move the pin from it's original position"
-        new_studyspace_form = NewStudySpaceForm(request.POST)
-        if new_studyspace_form.is_valid():
-            location = Location.objects.get(pk=location_id)
-            spot = PendingStudySpot(
-                content_type=ContentType.objects.get_for_model(location),
-                object_id=location.pk,
-                name=new_studyspace_form.cleaned_data['spotName'],
-                capacity=new_studyspace_form.cleaned_data['capacity'],
-                comments=[new_studyspace_form.cleaned_data['comment']],
-                overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
-                comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
-                noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
-                crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
-            )
-            spot.save()
+                error_message = "Invalid form data: you must move the pin from its original position"
+        if location_id != -1 or pending_location_id:
+            new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
+            if new_studyspace_form.is_valid():
+                print(f'{location_id},{pending_location_id}')
+                if pending_location_id:
+                    pending_location = PendingLocation.objects.get(pk=pending_location_id)
+                else:
+                    pending_location = Location.objects.get(pk=location_id)
+                pending_space = PendingStudySpace(
+                    content_type=ContentType.objects.get_for_model(pending_location),
+                    object_id=pending_location.pk,
+                    name=new_studyspace_form.cleaned_data['studySpaceName'],
+                    capacity=new_studyspace_form.cleaned_data['capacity'],
+                    comments=[new_studyspace_form.cleaned_data['comment']],
+                    overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
+                    comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
+                    noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
+                    crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
+                )
+                pending_space.save()
+            else:
+                error_message = "Invalid Study Spot data."
+            return redirect(reverse("studyspots:confirmation"))
         else:
-            error_message = "Invalid Study Spot data."
-        return redirect("../../confirmation")
+            context = {
+                'starting_location': location_id,
+                'locations': locations_json,
+                'make_new_location_label': new_location_label,
+                'key': key,
+                'new_studyspace_form': new_studyspace_form,
+                'error_message': error_message,
+            }
+            return render(request, 'studyspots/add.html', context)
+    else:
+        new_location_form = NewLocationForm(prefix="new_location")
+        new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
     context = {
+        'starting_location': request.GET.get('location', None),
         'locations': locations_json,
         'make_new_location_label': new_location_label,
         'key': key,
-        'select_location_form': select_location_form,
         'new_location_form': new_location_form,
         'new_studyspace_form': new_studyspace_form,
         'error_message': error_message,
@@ -200,3 +198,9 @@ def process_studyspace_review(request, location_id, location_ordinal):
         return redirect('studyspots:get_studyspace_data', location_id=location_id, location_ordinal=location_ordinal)
     else:
         return redirect('studyspots:get_studyspace_data', location_id=location_id, location_ordinal=location_ordinal)
+
+
+def review_pending(request):
+    pending_locations = PendingLocationSerializer(PendingLocation.objects.all(), many=True).data
+    pending_studyspaces = PendingStudySpaceSerializer(PendingStudySpace.objects.all(), many=True).data
+    return JsonResponse({"pending_locations": pending_locations, "pending_studyspaces": pending_studyspaces}, safe=False)

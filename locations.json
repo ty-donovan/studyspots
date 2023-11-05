@@ -255,7 +255,7 @@
         "location_id": 29,
         "name": "Pavilion V ",
         "location_type": "Academic Building",
-        "address": " Pavilion V, East Lawn, University of Virginia campus, Charlottesville, VA ",
+        "address": "Pavilion V, East Lawn, University of Virginia campus, Charlottesville, VA ",
         "lat": 38.0349762,
         "lng": -78.5042027,
         "on_grounds": true
@@ -264,7 +264,7 @@
         "location_id": 30,
         "name": "Pavilion VIII ",
         "location_type": "Academic Building",
-        "address": " Pavilion VIII, East Lawn, University of Virginia campus, Charlottesville, VA ",
+        "address": "Pavilion VIII, East Lawn, University of Virginia campus, Charlottesville, VA ",
         "lat": 38.034362,
         "lng": -78.5035983,
         "on_grounds": true

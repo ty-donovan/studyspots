@@ -19,7 +19,7 @@
         return "{% url 'studyspots:get_studyspace_data' 100543 100542 %}".replace("100543", location_id).replace("100542", studyspace_id);
     }
     function get_add_with_location_url(location_id){
-        return "{% url 'studyspots:add_with_location' 100543 %}".replace("100543", location_id);
+        return "{% url 'studyspots:add'%}/?location="+location_id;
     }
     const map_url = "{% url 'studyspots:map'%}"
 </script>
