@@ -8,7 +8,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 
-
 class Location(models.Model):
     # variable as identifier for each location
     location_id = models.AutoField(primary_key=True)
@@ -242,3 +241,6 @@ class Admin(models.Model):
     )
     def username(obj):
         return obj.user.username
+
+    def email(obj):
+        return obj.user.email

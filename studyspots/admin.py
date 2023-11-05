@@ -10,7 +10,7 @@ class StudySpaceAdmin(admin.ModelAdmin):
 
 @admin.register(Admin)
 class AdminAdmin(admin.ModelAdmin):
-    list_display = ['username', 'is_admin']
+    list_display = ['username', 'email', 'is_admin']
 
 
 admin.site.register(Location)
