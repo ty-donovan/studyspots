@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import json
@@ -20,7 +20,15 @@ def is_ajax(request):
 
 
 def get_studyspace_by_ordinal(location_id, location_ordinal):
-    return StudySpace.objects.filter(location_id=location_id, location_ordinal=location_ordinal).get()
+    obj = StudySpace.objects.filter(location_id=location_id, location_ordinal=location_ordinal)
+    if obj:
+        return obj.get()
+    else:
+        return None
+
+
+def get_variable(request, name):
+    return request.GET.get(name, None)
 
 
 @login_required
@@ -41,6 +49,13 @@ def map(request):
         'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id
     }
     return render(request, 'studyspots/map.html', context)
+
+
+def map_redirect(request):
+    location_id = get_variable(request, 'location')
+    if location_id:
+        return redirect(reverse("studyspots:map") + "?location=" + location_id, permanent=True)
+    return redirect(reverse("studyspots:map"), permanent=True)
 
 
 @login_required()
@@ -156,54 +171,69 @@ def load(request):
     return JsonResponse(json_response, safe=False)
 
 
-def get_location_data(request, location_id):
-    if request.method == "GET" and is_ajax(request):
-        location = Location.objects.get(location_id=location_id)
-        location_data = StudySpaceSerializer(location.studyspace_set.all(), many=True).data
-        return JsonResponse(location_data, safe=False)
-    # render(request, )
-
-
-def get_studyspace_data(request, location_id, location_ordinal):
-    studyspace_obj = get_studyspace_by_ordinal(location_id, location_ordinal)
-    if request.method == "GET" and is_ajax(request):
-        studyspace_data = StudySpaceSerializer(studyspace_obj, many=False).data
-        return JsonResponse(studyspace_data, safe=False)
+def get_spot(request):
+    location_id = get_variable(request, 'location')
+    location_ordinal = get_variable(request, 'space')
+    if location_id:
+        if location_ordinal:
+            studyspace_obj = get_studyspace_by_ordinal(location_id, location_ordinal)
+            if not studyspace_obj:
+                raise Http404()
+            if is_ajax(request):
+                studyspace_data = StudySpaceSerializer(studyspace_obj, many=False).data
+                return JsonResponse(studyspace_data, safe=False)
+            else:
+                # used to render information about a study spot
+                rating = dict()
+                rating['overall'] = studyspace_obj.calculate_overall_rating()
+                rating['comfort'] = studyspace_obj.calculate_comfort_rating()
+                rating['noise_level'] = studyspace_obj.calculate_noise_level_rating()
+                rating['crowdedness'] = studyspace_obj.calculate_crowdedness_rating()
+                return render(request, 'studyspots/studyspace.html',
+                              {'studyspace': studyspace_obj, 'location_id': location_id, 'rating': rating})
+        else:
+            if is_ajax(request):
+                location = Location.objects.get(location_id=location_id)
+                location_data = StudySpaceSerializer(location.studyspace_set.all(), many=True).data
+                return JsonResponse(location_data, safe=False)
+            else:
+                return redirect(reverse("studyspots:map")+"?location="+location_id)
     else:
-        # used to render information about a study spot
-        rating = dict()
-        rating['overall'] = studyspace_obj.calculate_overall_rating()
-        rating['comfort'] = studyspace_obj.calculate_comfort_rating()
-        rating['noise_level'] = studyspace_obj.calculate_noise_level_rating()
-        rating['crowdedness'] = studyspace_obj.calculate_crowdedness_rating()
-        return render(request, 'studyspots/studyspace.html',
-                      {'studyspace': studyspace_obj, 'location_id': location_id, 'rating': rating})
+        raise Http404()
 
 
 # method to render a form to add a review for a study spot
-def review_studyspace(request, location_id, location_ordinal):
-    studyspace_obj = get_studyspace_by_ordinal(location_id, location_ordinal)
-    return render(request, 'studyspots/studyspace_form.html',
-                  {'location_id': location_id, 'studyspace': studyspace_obj})
+def review_studyspace(request):
+    location_id = get_variable(request, 'location')
+    location_ordinal = get_variable(request, 'space')
+    if location_id and location_ordinal:
+        studyspace_obj = get_studyspace_by_ordinal(location_id, location_ordinal)
+        return render(request, 'studyspots/studyspace_form.html',
+                      {'location_id': location_id, 'studyspace': studyspace_obj})
+    raise Http404()
 
 
 # method to process a review for a study spot and update database
-def process_studyspace_review(request, location_id, location_ordinal):
-    if request.method == 'POST':
-        studyspace = get_studyspace_by_ordinal(location_id, location_ordinal)
-        studyspace.overall_ratings.append(int(request.POST['overall']))
-        studyspace.comfort_ratings.append(int(request.POST['comfort']))
-        studyspace.noise_level_ratings.append(int(request.POST['noise_level']))
-        studyspace.crowdedness_ratings.append(int(request.POST['crowdedness']))
-        if request.POST['comment'] != "":
-            studyspace.comments.append(request.POST['comment'])
-        studyspace.save()
-        return redirect('studyspots:get_studyspace_data', location_id=location_id, location_ordinal=location_ordinal)
+def process_studyspace_review(request):
+    location_id = get_variable(request, 'location')
+    location_ordinal = get_variable(request, 'space')
+    if location_id and location_ordinal:
+        if request.method == 'POST':
+            studyspace = get_studyspace_by_ordinal(location_id, location_ordinal)
+            studyspace.overall_ratings.append(int(request.POST['overall']))
+            studyspace.comfort_ratings.append(int(request.POST['comfort']))
+            studyspace.noise_level_ratings.append(int(request.POST['noise_level']))
+            studyspace.crowdedness_ratings.append(int(request.POST['crowdedness']))
+            if request.POST['comment'] != "":
+                studyspace.comments.append(request.POST['comment'])
+            studyspace.save()
+        return redirect(reverse('studyspots:get_spot') + f'?location={location_id}&space={location_ordinal}')
     else:
-        return redirect('studyspots:get_studyspace_data', location_id=location_id, location_ordinal=location_ordinal)
+        raise Http404()
 
 
 def review_pending(request):
     pending_locations = PendingLocationSerializer(PendingLocation.objects.all(), many=True).data
     pending_studyspaces = PendingStudySpaceSerializer(PendingStudySpace.objects.all(), many=True).data
-    return JsonResponse({"pending_locations": pending_locations, "pending_studyspaces": pending_studyspaces}, safe=False)
+    return JsonResponse({"pending_locations": pending_locations, "pending_studyspaces": pending_studyspaces},
+                        safe=False)

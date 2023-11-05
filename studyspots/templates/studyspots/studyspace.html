@@ -16,7 +16,7 @@
                 <p class="home-text"><i class="bi bi-lamp-fill"></i> <strong>Comfort:</strong> {{ rating.comfort }}</p>
                 <p class="home-text"><i class="bi bi-volume-up-fill"></i> <strong>Noise Level:</strong> {{ rating.noise_level }}</p>
                 <p class="home-text"><i class="bi bi-people-fill"></i> <strong>Crowdedness:</strong> {{ rating.crowdedness }}</p>
-                <a href="{% url 'studyspots:review_studyspace' location_id studyspace.location_ordinal %}" class="btn mt-3 review_spot_btn">Review this spot</a>
+                <a href="{% url 'studyspots:review_studyspace'%}?location={{ location_id }}&space={{ studyspace.location_ordinal }}" class="btn mt-3 review_spot_btn">Review this spot</a>
                 <br>
                 <h4><i class="bi bi-chat-dots-fill"></i> Comments</h4>
                 <div class="comment-list">
@@ -27,7 +27,7 @@
                     <p class="comment-text">{{ comment }}</p>
                     {% endfor %}
                 </div>
-                <a href="{% url 'studyspots:map'%}" class="btn mt-3">Back</a>
+                <a href="{% url 'studyspots:map'%}?location={{ location_id }}" class="btn mt-3">Back</a>
             </ul>
         </div>
     </div>
