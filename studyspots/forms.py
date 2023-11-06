@@ -11,23 +11,34 @@ TYPE_CHOICES = [
     ('Other', 'Other'),
 ]
 
-RATING_CHOICES = [
-    (1, '1'),
-    (2, '2'),
-    (3, '3'),
-    (4, '4'),
-    (5, '5'),
+OVERALL_RATING_CHOICES = [
+    (1, '★ Would Not Recommend'),
+    (2, '★★'),
+    (3, '★★★'),
+    (4, '★★★★'),
+    (5, '★★★★★ Highly Recommend'),
 ]
-
-
-# class SelectExistingLocationForm(forms.Form):
-#     existing_locations = forms.ModelChoiceField(
-#         queryset=Location.objects.all(),
-#         to_field_name='name',
-#         label='Select an existing location',
-#         empty_label='Select a location',
-#         required=True
-#     )
+COMFORT_RATING_CHOICES = [
+    (1, 'Very Uncomfortable'),
+    (2, 'Uncomfortable'),
+    (3, 'Moderate'),
+    (4, 'Comfortable'),
+    (5, 'Very Comfortable'),
+]
+NOISE_RATING_CHOICES = [
+    (1, 'Extremely Noisy'),
+    (2, 'Somewhat Noisy'),
+    (3, 'Moderate'),
+    (4, 'Quiet'),
+    (5, 'Extremely Quiet'),
+]
+CROWDEDNESS_RATING_CHOICES = [
+    (1, 'Overcrowded'),
+    (2, 'Crowded'),
+    (3, 'Moderately Crowded'),
+    (4, 'Ample Space'),
+    (5, 'Empty'),
+]
 
 
 class NewLocationForm(forms.Form):
@@ -77,22 +88,22 @@ class NewStudySpaceForm(forms.Form):
         required=False
     )
     overall_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
+        choices=OVERALL_RATING_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     comfort_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
+        choices=COMFORT_RATING_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     noise_level_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
+        choices=NOISE_RATING_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     crowdedness_rating = forms.ChoiceField(
-        choices=RATING_CHOICES,
+        choices=CROWDEDNESS_RATING_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
