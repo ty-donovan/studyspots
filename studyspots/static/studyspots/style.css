@@ -59,11 +59,12 @@ nav {
     font-size: 1rem;
 }
 
-.review_spot_btn {
-    position: absolute; 
-    top: 43%; 
+/* btn for studyspace.html */
+.review-space-btn {
+    position: absolute;  
     right: 0; 
     margin-right: 15px;
+    font-size: 2rem;
 }
 
 .btn {
@@ -73,12 +74,63 @@ nav {
 
 @media only screen and (max-device-width : 480px) {
     /* mobile */
+
+    /* header footer -> base.html */
+    .nav-link-text {
+        font-size: 2.5rem;
+    }
+
+    .footer-text {
+        font-size: 1.5rem;
+    }
+
+    .nav-link-item {
+        font-size: 1.5rem;
+    }
+
+    .title-text {
+        font-size: 4rem;
+    }
+
+    /* Studyspace pages -> studyspace.html and connected form */
+    .home-text {
+        font-size: 2.5rem;
+    }
+
+    .comment-text {
+        font-size: 2.5rem;
+    }
+
+    .study-space-btn {
+        font-size: 2.5rem;
+    }
+
+    select.form-control {
+        font-size: 1.7rem;
+    }
+
+    textarea.study-space-form {
+        font-size: 2.5rem;
+    }
 }
+
 @media screen and (min-device-width: 481px){
+    /* desktop */
+
+    /* header footer -> base.html */
+    .footer-text {
+        font-size: 1rem;
+    }
+
+    .nav-link-item {
+        font-size: 1.3rem;
+    }
+
     .nav-link-text {
         font-size: 2rem;
     }
 
+    /* Studyspace pages -> studyspace.html and connected form */
     .home-text {
         font-size: 2rem;
     }
@@ -91,7 +143,7 @@ nav {
     }
 
     .title-text {
-        font-size: 3.5rem;
+        font-size: 3rem;
     }
 
     /*.main-wrapper {*/

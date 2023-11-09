@@ -19,25 +19,25 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:map' %}">Map</a>
+                                <a class="nav-link fw-bold nav-color nav-link-item" href="{% url 'studyspots:map' %}">Map</a>
                             </li>
                             {% load socialaccount %}
                             {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:add' %}">Add New Spot</a>
+                                <a class="nav-link fw-bold nav-color nav-link-item" href="{% url 'studyspots:add' %}">Add New Spot</a>
                             </li>
                             {% endif %}
                             {% if user.admin.is_admin %}
                                 <li class="nav-item">
-                                    <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:review' %}">Review Pending Spots</a>
+                                    <a class="nav-link fw-bold nav-color nav-link-item" href="{% url 'studyspots:review' %}">Review Pending Spots</a>
                                 </li>
                             {% endif %}
                             <li class="nav-item">
                                 {% load socialaccount %}
                                 {% if user.is_authenticated %}
-                                <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% url 'studyspots:logout' %}">Logout</a>
+                                <a class="nav-link fw-bold nav-color nav-link-item" href="{% url 'studyspots:logout' %}">Logout</a>
                                 {% else %}
-                                <a class="nav-link fw-bold fs-5 fs-sm-6 nav-color" href="{% provider_login_url "google" method="oauth2" %}">Login</a>
+                                <a class="nav-link fw-bold nav-color nav-link-item" href="{% provider_login_url "google" method="oauth2" %}">Login</a>
                                 {% endif %}
                             </li>
 
@@ -56,16 +56,16 @@
             <div class="container justify-content-center">
                 <div class="row">
                     <div class="col-md-4 footer-div">
-                        <p class="mb-0 fs-6">B0-2 Corporation</p>
-                        <p class="mb-0 fs-6">Copyright &copy; 2023 B0-2 Corp.</p>
-                    </div>
-                    <div class="col-md-4 fs-6 footer-div">
-                        <p class="mb-0 fs-6">Legal Stuff</p>
-                        <p class="mb-0 fs-6">User Policy</p>
+                        <p class="mb-0 footer-text">B0-2 Corporation</p>
+                        <p class="mb-0 footer-text">Copyright &copy; 2023 B0-2 Corp.</p>
                     </div>
                     <div class="col-md-4 footer-div">
-                        <p class="mb-0 fs-6">Privacy Policy</p>
-                        <p class="mb-0 fs-6">Contact Us</p>
+                        <p class="mb-0 footer-text">Legal Stuff</p>
+                        <p class="mb-0 footer-text">User Policy</p>
+                    </div>
+                    <div class="col-md-4 footer-div">
+                        <p class="mb-0 footer-text">Privacy Policy</p>
+                        <p class="mb-0 footer-text">Contact Us</p>
                     </div>
                 </div>
             </div>

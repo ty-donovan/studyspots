@@ -203,6 +203,21 @@ def get_spot(request):
 
 # method to render a form to add a review for a study spot
 def review_studyspace(request):
+    """
+    Render the review form for a specific study space.
+
+    This function retrieves the location ID and ordinal from the request, gets the corresponding study space,
+    and renders the 'studyspace_form.html' template with the location ID and study space as context variables.
+
+    If the location ID or ordinal is not provided, the function raises an Http404 error.
+
+    Args:
+        request: The HTTP request.
+
+    Returns:
+        An HttpResponse object with the rendered text of the 'studyspace_form.html' template.
+    """
+    
     location_id = get_variable(request, 'location')
     location_ordinal = get_variable(request, 'space')
     if location_id and location_ordinal:
@@ -214,6 +229,21 @@ def review_studyspace(request):
 
 # method to process a review for a study spot and update database
 def process_studyspace_review(request):
+    """
+    Process a review for a study spot and update the database.
+
+    This function retrieves the location ID and ordinal from the request, gets the corresponding study space,
+    updates its ratings and comments based on the POST data, and saves the changes to the database.
+
+    If the location ID or ordinal is not provided, or if the request method is not POST, the function raises an Http404 error.
+
+    Args:
+        request: The HTTP request.
+
+    Returns:
+        A redirect to the 'get_spot' view for the specified location and study space.
+    """
+    
     location_id = get_variable(request, 'location')
     location_ordinal = get_variable(request, 'space')
     if location_id and location_ordinal:
