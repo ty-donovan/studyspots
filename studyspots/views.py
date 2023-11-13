@@ -261,8 +261,144 @@ def process_studyspace_review(request):
         raise Http404()
 
 
+@login_required
 def review_pending(request):
-    pending_locations = PendingLocationSerializer(PendingLocation.objects.all(), many=True).data
-    pending_studyspaces = PendingStudySpaceSerializer(PendingStudySpace.objects.all(), many=True).data
-    return JsonResponse({"pending_locations": pending_locations, "pending_studyspaces": pending_studyspaces},
-                        safe=False)
+    pending_studyspaces = PendingStudySpace.objects.all()
+    context = {
+        'pending_studyspaces': pending_studyspaces,
+    }
+    return render(request, 'studyspots/pending.html', context)
+
+
+def pending_detail(request, studyspace_id):
+    pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
+    pending_location = None
+    if pending_studyspace.content_type.model == 'pendinglocation':
+        pending_location_id = pending_studyspace.object_id
+        pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
+    context = {
+        'pending_studyspace': pending_studyspace,
+        'pending_location': pending_location,
+    }
+    return render(request, 'studyspots/pendingDetail.html', context)
+
+
+def approve_pending(request, studyspace_id):
+    pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
+    if pending_studyspace.content_type.model == 'pendinglocation':
+        new_location = Location(
+            name=pending_studyspace.location.name,
+            location_type=pending_studyspace.location.location_type,
+            on_grounds=pending_studyspace.location.on_grounds,
+            lat=pending_studyspace.location.lat,
+            lng=pending_studyspace.location.lng,
+        )
+        new_location.save()
+        new_studyspace = StudySpace(
+            location_id=new_location,
+            name=pending_studyspace.name,
+            capacity=pending_studyspace.capacity,
+            comments=pending_studyspace.comments,
+            overall_ratings=pending_studyspace.overall_ratings,
+            comfort_ratings=pending_studyspace.comfort_ratings,
+            noise_level_ratings=pending_studyspace.noise_level_ratings,
+            crowdedness_ratings=pending_studyspace.crowdedness_ratings,
+        )
+        new_studyspace.save()
+        pending_studyspace.delete()
+        pending_studyspace.location.delete()
+        return render(request, 'studyspots/reviewConfirmation.html')
+    else:
+        new_studyspace = StudySpace(
+            location_id=pending_studyspace.location,
+            name=pending_studyspace.name,
+            capacity=pending_studyspace.capacity,
+            comments=pending_studyspace.comments,
+            overall_ratings=pending_studyspace.overall_ratings,
+            comfort_ratings=pending_studyspace.comfort_ratings,
+            noise_level_ratings=pending_studyspace.noise_level_ratings,
+            crowdedness_ratings=pending_studyspace.crowdedness_ratings,
+        )
+        new_studyspace.save()
+        pending_studyspace.delete()
+        return render(request, 'studyspots/reviewConfirmation.html')
+
+
+def reject_pending(request, studyspace_id):
+    pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
+    if pending_studyspace.content_type.model == 'pendinglocation':
+        pending_location_id = pending_studyspace.object_id
+        pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
+        pending_location.delete()
+        pending_studyspace.delete()
+    else:
+        pending_studyspace.delete()
+
+    return render(request, 'studyspots/reviewConfirmation.html')
+
+
+def reviewConfirmation(request):
+    return render(request, 'studyspots/reviewConfirmation.html')
+
+
+def change_location(request, studyspace_id):
+    pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
+    if pending_studyspace.content_type.model == 'pendinglocation':
+        pending_location_id = pending_studyspace.object_id
+        pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
+        if request.method == 'POST':
+            new_studyspace_form = NewStudySpaceForm(request.POST, prefix='pending_studyspace')
+            new_location_form = NewLocationForm(request.POST, prefix='pending_location')
+            if new_studyspace_form.is_valid():
+                new_location_form.is_valid()
+                edit_pending_location = PendingLocation(
+                    name=new_location_form.cleaned_data['locationName'],
+                    location_type=new_location_form.cleaned_data['location_type'],
+                    on_grounds=new_location_form.cleaned_data['on_grounds'],
+                    lat=pending_location.lat,
+                    lng=pending_location.lng,
+                )
+                edit_pending_location.save()
+                pending_location.delete()
+                edit_pending_space = PendingStudySpace(
+                    content_type=ContentType.objects.get_for_model(edit_pending_location),
+                    object_id=edit_pending_location.pk,
+                    name=new_studyspace_form.cleaned_data['studySpaceName'],
+                    capacity=new_studyspace_form.cleaned_data['capacity'],
+                    comments=[new_studyspace_form.cleaned_data['comment']],
+                    overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
+                    comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
+                    noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
+                    crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
+                )
+                edit_pending_space.save()
+                pending_studyspace.delete()
+                return redirect('studyspots:reviewConfirmation')
+    else:
+        pending_location = None
+        new_location_form = None
+        if request.method == 'POST':
+            new_studyspace_form = NewStudySpaceForm(request.POST)
+            if new_studyspace_form.is_valid():
+                edit_pending_space = PendingStudySpace(
+                    content_type=ContentType.objects.get_for_model(pending_studyspace.location),
+                    object_id=pending_studyspace.location.pk,
+                    name=new_studyspace_form.cleaned_data['studySpaceName'],
+                    capacity=new_studyspace_form.cleaned_data['capacity'],
+                    comments=[new_studyspace_form.cleaned_data['comment']],
+                    overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
+                    comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
+                    noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
+                    crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
+                )
+                edit_pending_space.save()
+                pending_studyspace.delete()
+                return redirect('studyspots:reviewConfirmation')
+    context = {
+        'new_studyspace_form': new_studyspace_form,
+        'pending_studyspace': pending_studyspace,
+        'new_location_form': new_location_form,
+        'pending_location': pending_location,
+               }
+    return render(request, 'studyspots/change_location.html', context)
+

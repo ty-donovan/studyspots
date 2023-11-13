@@ -17,5 +17,9 @@ urlpatterns = [
     re_path(r'^spot/$', views.get_spot, name="get_spot"),
     re_path(r'^review_spot/$', views.review_studyspace, name="review_studyspace"),
     re_path(r'^process_review/$', views.process_studyspace_review, name="process_studyspace_review"),
-
+    path('pending_detail/<int:studyspace_id>/', views.pending_detail, name='pending_detail'),
+    path('approve_pending/<int:studyspace_id>/', views.approve_pending, name='approve_pending'),
+    path('reject/<int:studyspace_id>/', views.reject_pending, name='reject_pending'),
+    path('change_location/<int:studyspace_id>/', views.change_location, name='change_location'),
+    path("review_confirmation/", views.reviewConfirmation, name="reviewConfirmation"),
 ]

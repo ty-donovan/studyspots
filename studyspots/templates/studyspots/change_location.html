@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load bootstrap5 %}
+<link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
+
+<h2 class="text-center">Edit Pending Spot</h2>
+<form method="post">
+    {% csrf_token %}
+    {% if pending_location %}
+    {% bootstrap_form new_location_form %}
+    {% bootstrap_form new_studyspace_form %}
+    <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
+    {% else %}
+    {% bootstrap_form new_studyspace_form %}
+    <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
+    {% endif %}
+</form>
+
+{% endblock %}
