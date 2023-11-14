@@ -1,5 +1,9 @@
 // noinspection JSDeprecatedSymbols
-// const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
+
+let map;
+let locationObjects = new Map();
+let infowindow = null;
+
 function getUrl(url = "/") {
     if (!url.startsWith("/")) {
         url = "/" + url;
@@ -50,7 +54,6 @@ function createAddStudySpace() {
     return addStudySpaceButton;
 }
 
-let map;
 
 function createHomeButton(mapControls, startingPosition, startingZoom) {
     const homeButton = document.createElement("button");
@@ -97,8 +100,7 @@ function createHomeButton(mapControls, startingPosition, startingZoom) {
     return homeButton;
 }
 
-let locationObjects = new Map();
-let infowindow = null;
+
 function initMap() {
     const startingPosition = new google.maps.LatLng(38.0356, -78.5034);
     const startingZoom = 17;
@@ -110,8 +112,6 @@ function initMap() {
         streetViewControl: false,
     });
     const centerControlDiv = document.createElement("div");
-    const homeButton = createHomeButton(map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER], startingPosition, startingZoom);
-    centerControlDiv.appendChild(homeButton);
     if (is_authenticated) {
         const addStudySpaceButton = createAddStudySpace(); //creates
         centerControlDiv.appendChild(addStudySpaceButton);
@@ -129,23 +129,32 @@ function initMap() {
         });
         locationObjects.set(location.location_id, {'location': location, 'marker': marker});
         marker.addListener("click", () => {
-            selectLocation(location.location_id);
+            focusLocation(location.location_id);
         });
     })
+
     if (starting_location_id && locationObjects.has(starting_location_id)) {
         const prevFocus = focusInstant;
         focusInstant = true;
         new google.maps.event.trigger(locationObjects.get(starting_location_id).marker, "click", {});
         focusInstant = prevFocus;
     }
+    const homeButton = createHomeButton(map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER], startingPosition, startingZoom);
+    centerControlDiv.appendChild(homeButton);
 
 }
-let focusInstant = true;
+
 function selectLocation(location_id){
+    new google.maps.event.trigger(locationObjects.get(location_id).marker, "click", {})
+}
+
+let focusInstant = true;
+function focusLocation(location_id){
     if (location_id && locationObjects.has(location_id)) {
         const obj = locationObjects.get(location_id);
         let location = obj.location;
         let marker = obj.marker;
+
         infowindow.close();
         infowindow.setContent(makeWindowContent(location));
         scrollToLocationInList(location_id);
@@ -154,7 +163,8 @@ function selectLocation(location_id){
         .then((response) => response.json())
         .then((data) => {
             infowindow.setContent(makeWindowContent(location, data))
-        }).then(infowindow.open(map, marker));
+        });
+        starting_location_id = location_id;
     }
 
 

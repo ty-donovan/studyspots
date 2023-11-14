@@ -8,10 +8,9 @@
         src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script>
     const is_authenticated = '{{ user.is_authenticated }}'==='True';
-    console.log(is_authenticated)
     const add_studyspot_icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
     const home_icon = "{% static 'studyspots/map/img/go-home.svg' %}"
-    const starting_location_id = [{{ starting_location_id }}][0];
+    let starting_location_id = [{{ starting_location_id }}][0];
     function get_location_data_url(location_id){
         return "{% url 'studyspots:get_spot' %}?location="+location_id;
     }
