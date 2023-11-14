@@ -97,7 +97,8 @@ function createHomeButton(mapControls, startingPosition, startingZoom) {
     return homeButton;
 }
 
-
+let locationObjects = new Map();
+let infowindow = null;
 function initMap() {
     const startingPosition = new google.maps.LatLng(38.0356, -78.5034);
     const startingZoom = 17;
@@ -116,10 +117,7 @@ function initMap() {
         centerControlDiv.appendChild(addStudySpaceButton);
         map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER].setAt(0,addStudySpaceButton);
     }
-    var infowindow = new google.maps.InfoWindow({
-        content: ""
-    });
-    let locationObjects = new Map();
+    infowindow = new google.maps.InfoWindow({  content: "" });
     locations.forEach((location, i) => {
         const pin = new google.maps.marker.PinElement({})
         const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -131,20 +129,34 @@ function initMap() {
         });
         locationObjects.set(location.location_id, {'location': location, 'marker': marker});
         marker.addListener("click", () => {
-            infowindow.close();
-            infowindow.setContent(makeWindowContent(location));
-            fetchResource(get_location_data_url(location.location_id))
-                .then((response) => response.json())
-                .then((data) => {
-                    infowindow.setContent(makeWindowContent(location, data))
-                }).then(infowindow.open(map, marker));
-            scrollToLocationInList(location.location_id)
-            window.history.replaceState(null, document.title, get_map_with_location_url(location.location_id))
+            selectLocation(location.location_id);
         });
     })
     if (starting_location_id && locationObjects.has(starting_location_id)) {
+        const prevFocus = focusInstant;
+        focusInstant = true;
         new google.maps.event.trigger(locationObjects.get(starting_location_id).marker, "click", {});
+        focusInstant = prevFocus;
     }
+
+}
+let focusInstant = true;
+function selectLocation(location_id){
+    if (location_id && locationObjects.has(location_id)) {
+        const obj = locationObjects.get(location_id);
+        let location = obj.location;
+        let marker = obj.marker;
+        infowindow.close();
+        infowindow.setContent(makeWindowContent(location));
+        scrollToLocationInList(location_id);
+        window.history.replaceState({}, document.title, get_map_with_location_url(location_id));
+        const outcome =  fetchResource(get_location_data_url(location.location_id))
+        .then((response) => response.json())
+        .then((data) => {
+            infowindow.setContent(makeWindowContent(location, data))
+        }).then(infowindow.open(map, marker));
+    }
+
 
 }
 
@@ -152,7 +164,8 @@ function scrollToLocationInList(location_id){
     if (location_id) {
         const studyspotsListObj = document.getElementById("studyspots-list-item" + location_id);
         if (studyspotsListObj) {
-            studyspotsListObj.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+            let behavior = focusInstant ? "auto" : "smooth";
+            studyspotsListObj.scrollIntoView({behavior: behavior,  block: "start", inline: "nearest"});
         }
 
     }
@@ -177,8 +190,5 @@ function formatPostLinks(location, data) {
 
 
 window.initMap = initMap;
-window.onload = function() {
-    scrollToLocationInList(starting_location_id)
-}
 
 

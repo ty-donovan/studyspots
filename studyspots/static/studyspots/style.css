@@ -52,10 +52,13 @@ nav {
 .list-constraint{
     height: 100%;
     width: 100%;
-    list-style-position: inside;
     position: absolute;
     overflow-y:scroll;
     -webkit-overflow-scrolling: touch;
+}
+
+.studyspot-list-item-spot{
+    list-style: decimal inside none;;
 }
 
 

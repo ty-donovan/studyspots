@@ -43,9 +43,9 @@
                         </li>
                     {% else %}
                         {% for location_obj in location_objs %}
-                            <li class="list-group-item"  id="studyspots-list-item{{ location_obj.location_id }}">
-                                <a href="{% url 'studyspots:map' %}?location={{ location_obj.location_id }}" class="font-weight-bold">{{ location_obj.name }}</a>
-                                <ol>
+                            <li class="list-group-item" id="studyspots-list-item{{ location_obj.location_id }}">
+                                <a onclick="selectLocation({{ location_obj.location_id }})" class="font-weight-bold">{{ location_obj.name }}</a>
+                                <ol class="">
                                 {% for space_obj in space_objs %}
                                     {% if space_obj.location_id == location_obj %}
                                         <li>
