@@ -18,7 +18,7 @@
                         {% for studyspace in pending_studyspaces %}
                             <li class="list-group-item">
                                 <span class="font-weight-bold">{{ studyspace.location }}:</span>
-                                <a href="{% url 'studyspots:pending_detail' studyspace.studyspace_id %}" class="font-weight-bold">{{ studyspace.name }}</a>
+                                <a href="{% url 'studyspots:pending' %}?studyspot={{ studyspace.studyspace_id }}" class="font-weight-bold">{{ studyspace.name }}</a>
                             </li>
                         {% endfor %}
                     </ul>

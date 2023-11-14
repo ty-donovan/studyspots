@@ -8,15 +8,16 @@
 <form method="post">
     {% csrf_token %}
     {% if pending_location %}
+        {# Insert map picker thing #}
     {% bootstrap_form new_location_form %}
     {% bootstrap_form new_studyspace_form %}
-    <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+    <form method="POST" action="{% url 'studyspots:change_location' %}?studyspot={{ pending_studyspace.studyspace_id }}">
         {% csrf_token %}
         <button type="submit" class="btn btn-success">Save Changes</button>
     </form>
     {% else %}
     {% bootstrap_form new_studyspace_form %}
-    <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+    <form method="POST" action="{% url 'studyspots:change_location' %}?studyspot={{ pending_studyspace.studyspace_id }}">
         {% csrf_token %}
         <button type="submit" class="btn btn-success">Save Changes</button>
     </form>

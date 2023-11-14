@@ -199,7 +199,11 @@ def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_nam
 
     added_objects = []
     for object_dict in objects:
-        if cls.objects.filter(**{f'{id_var_name}': int(object_dict[f'{id_var_name}'])}).count() == 0:
+        if cls.objects.filter(
+                **{
+                    f'{id_var_name}': int(object_dict[str(id_var_name)])
+                }
+        ).count() == 0:
             obj = cls()
             for k, v in object_dict.items():
                 setattr(obj, k, v)
@@ -247,10 +251,10 @@ def get_spot(request):
         raise Http404()
 
 
-# method to render a form to add a review for a study spot
+# method to render a form to add a pending for a study spot
 def review_studyspace(request):
     """
-    Render the review form for a specific study space.
+    Render the pending form for a specific study space.
 
     This function retrieves the location ID and ordinal from the request, gets the corresponding study space,
     and renders the 'studyspace_form.html' template with the location ID and study space as context variables.
@@ -263,7 +267,7 @@ def review_studyspace(request):
     Returns:
         An HttpResponse object with the rendered text of the 'studyspace_form.html' template.
     """
-    
+
     location_id = get_variable(request, 'location')
     location_ordinal = get_variable(request, 'space')
     if location_id and location_ordinal:
@@ -273,10 +277,10 @@ def review_studyspace(request):
     raise Http404()
 
 
-# method to process a review for a study spot and update database
+# method to process a pending for a study spot and update database
 def process_studyspace_review(request):
     """
-    Process a review for a study spot and update the database.
+    Process a pending for a study spot and update the database.
 
     This function retrieves the location ID and ordinal from the request, gets the corresponding study space,
     updates its ratings and comments based on the POST data, and saves the changes to the database.
@@ -289,7 +293,7 @@ def process_studyspace_review(request):
     Returns:
         A redirect to the 'get_spot' view for the specified location and study space.
     """
-    
+
     location_id = get_variable(request, 'location')
     location_ordinal = get_variable(request, 'space')
     if location_id and location_ordinal:
@@ -308,15 +312,14 @@ def process_studyspace_review(request):
 
 
 @login_required
-def approve(request):
-    pending_studyspaces = PendingStudySpace.objects.all()
-    context = {
-        'pending_studyspaces': pending_studyspaces,
-    }
-    return render(request, 'studyspots/pending.html', context)
-
-
-def pending_detail(request, studyspace_id):
+def pending(request):
+    studyspace_id = get_variable(request, 'studyspot')
+    if not studyspace_id:
+        pending_studyspaces = PendingStudySpace.objects.all()
+        context = {
+            'pending_studyspaces': pending_studyspaces,
+        }
+        return render(request, 'studyspots/pending.html', context)
     pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
     pending_location = None
     if pending_studyspace.content_type.model == 'pendinglocation':
@@ -329,7 +332,10 @@ def pending_detail(request, studyspace_id):
     return render(request, 'studyspots/pendingDetail.html', context)
 
 
-def approve_pending(request, studyspace_id):
+def approve_pending(request):
+    studyspace_id = get_variable(request, "studyspot")
+    if not studyspace_id:
+        return redirect(reverse('studyspots:pending'), False)
     pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
     if pending_studyspace.content_type.model == 'pendinglocation':
         new_location = Location(
@@ -387,7 +393,10 @@ def reviewConfirmation(request):
     return render(request, 'studyspots/reviewConfirmation.html')
 
 
-def change_location(request, studyspace_id):
+def change_location(request):
+    studyspace_id = get_variable(request, 'studyspot')
+    if not studyspace_id:
+        return redirect(reverse('studyspots:pending'), False)
     pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
     if pending_studyspace.content_type.model == 'pendinglocation':
         pending_location_id = pending_studyspace.object_id

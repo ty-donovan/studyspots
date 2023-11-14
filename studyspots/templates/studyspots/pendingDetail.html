@@ -25,36 +25,36 @@
 
             <div class="btn-group">
                 {% if pending_location %}
-                <form method="POST" action="{% url 'studyspots:approve_pending' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:approve_pending' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-success">Approve</button>
                 </form>
-                <form method="POST" action="{% url 'studyspots:reject_pending' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:reject_pending' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Reject</button>
                 </form>
-                <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:change_location' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Reassign Location or Edit</button>
                 </form>
                 <form>
-                    <a href="{% url 'studyspots:approve' %}" class="btn btn-secondary">Return to Pending Spots</a>
+                    <a href="{% url 'studyspots:pending' %}" class="btn btn-secondary">Return to Pending Spots</a>
                 </form>
                 {% else %}
-                <form method="POST" action="{% url 'studyspots:approve_pending' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:approve_pending' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-success">Approve</button>
                 </form>
-                <form method="POST" action="{% url 'studyspots:reject_pending' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:reject_pending' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Reject</button>
                 </form>
-                <form method="POST" action="{% url 'studyspots:change_location' pending_studyspace.studyspace_id %}">
+                <form method="POST" action="{% url 'studyspots:change_location' %}?studyspot={{ pending_studyspace.studyspace_id }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Edit</button>
                 </form>
                 <form>
-                    <a href="{% url 'studyspots:approve' %}" class="btn btn-secondary">Return to Pending Spots</a>
+                    <a href="{% url 'studyspots:pending' %}" class="btn btn-secondary">Return to Pending Spots</a>
                 </form>
                 {% endif %}
             </div>
