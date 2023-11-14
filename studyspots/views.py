@@ -41,12 +41,15 @@ def confirmation(request):
 
 
 def map(request):
-    starting_location_id = request.GET.get('location', None)
+    starting_location_id = request.GET.get('location', "null")
     key = settings.GOOGLE_API_KEY
+    location_objs = Location.objects.all().filter(studyspace__isnull=False).order_by("name")
+    space_objs = StudySpace.objects.all().order_by("location_ordinal").order_by("location_id")
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
     context = {
-        'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id
+        'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id,
+        'location_objs': location_objs, 'space_objs': space_objs
     }
     return render(request, 'studyspots/map.html', context)
 
@@ -58,6 +61,7 @@ def map_redirect(request):
     return redirect(reverse("studyspots:map"), permanent=True)
 
 
+# this is a mess rn
 @login_required()
 def add(request):
     new_location_form, new_studyspace_form = None, None
@@ -71,7 +75,7 @@ def add(request):
         print(request.POST)
         selected_location = request.POST['existing_location']
         print(selected_location)
-        pending_location_id = None
+        pending_location = None
         if selected_location:
             location_id = int(selected_location)
         else:
@@ -95,33 +99,50 @@ def add(request):
                         location_type=new_location_form.cleaned_data['location_type'],
                         on_grounds=new_location_form.cleaned_data['on_grounds'],
                         lat=lat,
-                        lng=lng,
+                        lng=lng
                     )
-                    pending_location.save()
-                    pending_location_id = pending_location.location_id
                 else:
                     # Location is outside the 10-mile radius
                     error_message = "Location must be closer to the University of Virginia."
             else:
                 error_message = "Invalid form data: you must move the pin from its original position"
+        else:
+            pending_location = Location.objects.get(pk=location_id)
+        if error_message:
+            print(error_message)
         new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
         if new_studyspace_form.is_valid() and new_studyspace_form.cleaned_data['capacity'] > 0:
-            if pending_location_id:
-                pending_location = PendingLocation.objects.get(pk=pending_location_id)
-            else:
-                pending_location = Location.objects.get(pk=location_id)
+            print(location_id)
             pending_space = PendingStudySpace(
-                content_type=ContentType.objects.get_for_model(pending_location),
-                object_id=pending_location.pk,
                 name=new_studyspace_form.cleaned_data['studySpaceName'],
                 capacity=new_studyspace_form.cleaned_data['capacity'],
                 comments=[new_studyspace_form.cleaned_data['comment']],
-                overall_ratings=[new_studyspace_form.cleaned_data['overall_rating']],
-                comfort_ratings=[new_studyspace_form.cleaned_data['comfort_rating']],
-                noise_level_ratings=[new_studyspace_form.cleaned_data['noise_level_rating']],
-                crowdedness_ratings=[new_studyspace_form.cleaned_data['crowdedness_rating']],
+                overall_ratings=[int(new_studyspace_form.cleaned_data['overall_rating'])],
+                comfort_ratings=[int(new_studyspace_form.cleaned_data['comfort_rating'])],
+                noise_level_ratings=[int(new_studyspace_form.cleaned_data['noise_level_rating'])],
+                crowdedness_ratings=[int(new_studyspace_form.cleaned_data['crowdedness_rating'])],
             )
-            pending_space.save()
+            if location_id != -1:
+                pending_space.content_type = ContentType.objects.get(model="location")
+                pending_space.object_id = location_id
+            else:
+                pending_space.content_type = ContentType.objects.get(model="pendinglocation")
+                pending_location.save()
+                pending_space.object_id = pending_location.location_id
+                print(pending_location)
+            if error_message:
+                context = {
+                    'starting_location': location_id,
+                    'locations': locations_json,
+                    'make_new_location_label': new_location_label,
+                    'key': key,
+                    'new_studyspace_form': new_studyspace_form,
+                    'error_message': error_message,
+                }
+                return render(request, 'studyspots/add.html', context)
+            else:
+                print(pending_space)
+                pending_space.save()
             return redirect(reverse("studyspots:confirmation"))
         else:
             if new_studyspace_form.cleaned_data['capacity'] < 1:
@@ -156,18 +177,21 @@ def add(request):
 
 # Add all the locations from the file to database. Do not use.
 def load(request):
-    json_response = dict({"Success": "Resource successfully added to database"})
-    if Location.objects.exists():
-        json_response = {"No need": "Locations db already populated"}
+    if settings.DEBUG:
+        json_response = dict({"Success": "Resource successfully added to database"})
+        if Location.objects.exists():
+            json_response = {"No need": "Locations db already populated"}
+        else:
+            with open('locations.json') as json_file:
+                locations = json.load(json_file)
+            for location_dict in locations:
+                location = Location()
+                for k, v in location_dict.items():
+                    setattr(location, k, v)
+                location.save()
+        return JsonResponse(json_response, safe=False)
     else:
-        with open('locations.json') as json_file:
-            locations = json.load(json_file)
-        for location_dict in locations:
-            location = Location()
-            for k, v in location_dict.items():
-                setattr(location, k, v)
-            location.save()
-    return JsonResponse(json_response, safe=False)
+        return HttpResponseNotFound()
 
 
 def get_spot(request):
@@ -262,7 +286,7 @@ def process_studyspace_review(request):
 
 
 @login_required
-def review_pending(request):
+def approve(request):
     pending_studyspaces = PendingStudySpace.objects.all()
     context = {
         'pending_studyspaces': pending_studyspaces,

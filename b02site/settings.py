@@ -32,7 +32,6 @@ if not IS_HEROKU_APP:
     DEBUG = True
 elif 'DEBUG' in os.environ and os.environ['DEBUG'] == 'True':
     DEBUG = True
-
 if IS_HEROKU_APP:
     ALLOWED_HOSTS = ["*"]
 else:

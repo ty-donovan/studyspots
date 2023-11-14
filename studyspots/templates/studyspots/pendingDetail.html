@@ -38,7 +38,7 @@
                     <button type="submit" class="btn btn-danger">Reassign Location or Edit</button>
                 </form>
                 <form>
-                    <a href="{% url 'studyspots:review' %}" class="btn btn-secondary">Return to Pending Spots</a>
+                    <a href="{% url 'studyspots:approve' %}" class="btn btn-secondary">Return to Pending Spots</a>
                 </form>
                 {% else %}
                 <form method="POST" action="{% url 'studyspots:approve_pending' pending_studyspace.studyspace_id %}">
@@ -54,7 +54,7 @@
                     <button type="submit" class="btn btn-danger">Edit</button>
                 </form>
                 <form>
-                    <a href="{% url 'studyspots:review' %}" class="btn btn-secondary">Return to Pending Spots</a>
+                    <a href="{% url 'studyspots:approve' %}" class="btn btn-secondary">Return to Pending Spots</a>
                 </form>
                 {% endif %}
             </div>

@@ -42,6 +42,22 @@ nav {
     background-color: #eeeeee;
 }
 
+.list-container{
+    width: 100%;
+    height: 95%;
+    overflow: hidden;
+    position: relative;
+}
+
+.list-constraint{
+    height: 100%;
+    width: 100%;
+    list-style-position: inside;
+    position: absolute;
+    overflow-y:scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
 
 .home-text {
     font-size: 1rem;

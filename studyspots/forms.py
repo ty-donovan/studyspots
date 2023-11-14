@@ -109,4 +109,4 @@ class NewStudySpaceForm(forms.Form):
     )
 
     def __int__(self, value, *args, **kwargs):
-        self.location = (value)
+        self.location = value
