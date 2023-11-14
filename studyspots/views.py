@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from json import JSONDecodeError
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
@@ -43,7 +44,7 @@ def confirmation(request):
 def map(request):
     starting_location_id = request.GET.get('location', "null")
     key = settings.GOOGLE_API_KEY
-    location_objs = Location.objects.all().filter(studyspace__isnull=False).order_by("name")
+    location_objs = Location.objects.all().filter(studyspace__isnull=False).distinct().order_by("name")
     space_objs = StudySpace.objects.all().order_by("location_ordinal").order_by("location_id")
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
@@ -178,20 +179,41 @@ def add(request):
 # Add all the locations from the file to database. Do not use.
 def load(request):
     if settings.DEBUG:
-        json_response = dict({"Success": "Resource successfully added to database"})
-        if Location.objects.exists():
-            json_response = {"No need": "Locations db already populated"}
-        else:
-            with open('locations.json') as json_file:
-                locations = json.load(json_file)
-            for location_dict in locations:
-                location = Location()
-                for k, v in location_dict.items():
-                    setattr(location, k, v)
-                location.save()
-        return JsonResponse(json_response, safe=False)
+        json_response = {}
+        json_response.update(__load_subprocess(Location, 'locations.json', name="location", id_var_name="location_id"))
+        json_response.update(__load_subprocess(StudySpace, 'studyspaces.json', name="studyspace", id_var_name="studyspace_id"))
+        return JsonResponse(json_response, safe=True)
     else:
         return HttpResponseNotFound()
+
+
+def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_name="id"):
+    if name_plural is None:
+        name_plural = name + "s"
+    with open(filename) as json_file:
+        try:
+            objects = json.load(json_file)
+        except JSONDecodeError as e:
+            e.msg += "Formatting error with json file"
+            raise e
+
+    added_objects = []
+    for object_dict in objects:
+        if cls.objects.filter(**{f'{id_var_name}': int(object_dict[f'{id_var_name}'])}).count() == 0:
+            obj = cls()
+            for k, v in object_dict.items():
+                setattr(obj, k, v)
+            obj.save()
+            added_objects.append(getattr(obj, id_var_name))
+    json_response = None
+    if len(added_objects) == 0:
+        json_response = dict({"Warning": f"No {name_plural} added. Already in database"})
+    elif len(added_objects) == 1:
+        json_response = dict({"Success": f"Added {name} {added_objects[0]}"})
+    else:
+        json_response = dict({"Success": f"Added {name_plural} {str(added_objects).replace('[', '').replace(']', '')}"})
+    json_response = {f'{name.title()}': f'{json_response}'}
+    return json_response
 
 
 def get_spot(request):
