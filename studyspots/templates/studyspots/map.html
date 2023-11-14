@@ -21,6 +21,9 @@
     function get_add_with_location_url(location_id){
         return "{% url 'studyspots:add' %}?location="+location_id;
     }
+    function get_map_with_location_url(location_id){
+        return "{% url 'studyspots:map' %}?location="+location_id;
+    }
     const map_url = "{% url 'studyspots:map'%}"
 </script>
 <script> const locations = [{{locations|safe}}][0]; </script>
@@ -33,14 +36,14 @@
             <div class="content-box">
                 <div class="panel-heading container"><h3 class="panel-title">Study Spots List</h3></div>
                 <div class="list-container panel-primary">
-                    <ul class="list-group list-constraint">
+                    <ul class="list-group list-constraint" id="studyspots-list">
                     {% if not location_objs %}
                         <li class="list-group-item"> Nothing here yet.
                             <a href="{% url 'studyspots:add' %}" class="font-weight-bold">Add a spot</a>!
                         </li>
                     {% else %}
                         {% for location_obj in location_objs %}
-                            <li class="list-group-item">
+                            <li class="list-group-item"  id="studyspots-list-item{{ location_obj.location_id }}">
                                 <a href="{% url 'studyspots:map' %}?location={{ location_obj.location_id }}" class="font-weight-bold">{{ location_obj.name }}</a>
                                 <ol>
                                 {% for space_obj in space_objs %}

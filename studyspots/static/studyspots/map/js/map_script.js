@@ -94,7 +94,6 @@ function createHomeButton(mapControls, startingPosition, startingZoom) {
             mapControls.push(homeButton);
         }
     });
-    console.log(typeof mapControls, mapControls)
     return homeButton;
 }
 
@@ -139,12 +138,24 @@ function initMap() {
                 .then((data) => {
                     infowindow.setContent(makeWindowContent(location, data))
                 }).then(infowindow.open(map, marker));
+            scrollToLocationInList(location.location_id)
+            window.history.replaceState(null, document.title, get_map_with_location_url(location.location_id))
         });
     })
     if (starting_location_id && locationObjects.has(starting_location_id)) {
         new google.maps.event.trigger(locationObjects.get(starting_location_id).marker, "click", {});
     }
 
+}
+
+function scrollToLocationInList(location_id){
+    if (location_id) {
+        const studyspotsListObj = document.getElementById("studyspots-list-item" + location_id);
+        if (studyspotsListObj) {
+            studyspotsListObj.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+        }
+
+    }
 }
 
 function makeWindowContent(location, data = null) {
@@ -163,12 +174,11 @@ function formatPostLinks(location, data) {
     return output;
 }
 
-//   function placeMarkerAndPanTo(latLng, map) {
-//     new PinElement({
-//     position: latLng,
-//     map: map,
-//   });
-//   map.panTo(latLng);
-// }
+
 
 window.initMap = initMap;
+window.onload = function() {
+    scrollToLocationInList(starting_location_id)
+}
+
+

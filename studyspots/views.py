@@ -45,7 +45,7 @@ def map(request):
     starting_location_id = request.GET.get('location', "null")
     key = settings.GOOGLE_API_KEY
     location_objs = Location.objects.all().filter(studyspace__isnull=False).distinct().order_by("name")
-    space_objs = StudySpace.objects.all().order_by("location_ordinal").order_by("location_id")
+    space_objs = StudySpace.objects.all().order_by("location_id").order_by("name")
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
     context = {
