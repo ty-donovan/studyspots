@@ -163,7 +163,7 @@ function focusLocation(location_id){
         .then((response) => response.json())
         .then((data) => {
             infowindow.setContent(makeWindowContent(location, data))
-        });
+        }).then(infowindow.open(map, marker));
         starting_location_id = location_id;
     }
 
