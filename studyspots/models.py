@@ -214,10 +214,12 @@ class PendingStudySpaceSerializer(serializers.ModelSerializer):
 
 
 def calculate_average_rating(ratings_list):
+    if any([True for rating in ratings_list if type(rating) is not int]):
+        ratings_list = [int(rating) for rating in ratings_list]
     total_ratings = sum(ratings_list)
     num_ratings = len(ratings_list)
     if num_ratings == 0:
-        return None
+        return "Not yet rated. Be the first to rate!"
     return round(total_ratings / num_ratings, 1)
 
 

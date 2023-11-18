@@ -1,5 +1,9 @@
 // noinspection JSDeprecatedSymbols
-// const locations = [{position: { lat: 38.0356, lng: -78.5034 }, primary_key: 1}, {position: { lat: 38.0366, lng: -78.5034 }, primary_key: 2}];
+
+let map;
+let locationObjects = new Map();
+let infowindow = null;
+
 function getUrl(url = "/") {
     if (!url.startsWith("/")) {
         url = "/" + url;
@@ -50,7 +54,6 @@ function createAddStudySpace() {
     return addStudySpaceButton;
 }
 
-let map;
 
 function createHomeButton(mapControls, startingPosition, startingZoom) {
     const homeButton = document.createElement("button");
@@ -94,7 +97,6 @@ function createHomeButton(mapControls, startingPosition, startingZoom) {
             mapControls.push(homeButton);
         }
     });
-    console.log(typeof mapControls, mapControls)
     return homeButton;
 }
 
@@ -110,17 +112,12 @@ function initMap() {
         streetViewControl: false,
     });
     const centerControlDiv = document.createElement("div");
-    const homeButton = createHomeButton(map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER], startingPosition, startingZoom);
-    centerControlDiv.appendChild(homeButton);
     if (is_authenticated) {
         const addStudySpaceButton = createAddStudySpace(); //creates
         centerControlDiv.appendChild(addStudySpaceButton);
         map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER].setAt(0,addStudySpaceButton);
     }
-    var infowindow = new google.maps.InfoWindow({
-        content: ""
-    });
-    let locationObjects = new Map();
+    infowindow = new google.maps.InfoWindow({  content: "" });
     locations.forEach((location, i) => {
         const pin = new google.maps.marker.PinElement({})
         const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -132,19 +129,56 @@ function initMap() {
         });
         locationObjects.set(location.location_id, {'location': location, 'marker': marker});
         marker.addListener("click", () => {
-            infowindow.close();
-            infowindow.setContent(makeWindowContent(location));
-            fetchResource(get_location_data_url(location.location_id))
-                .then((response) => response.json())
-                .then((data) => {
-                    infowindow.setContent(makeWindowContent(location, data))
-                }).then(infowindow.open(map, marker));
+            focusLocation(location.location_id);
         });
     })
+
     if (starting_location_id && locationObjects.has(starting_location_id)) {
+        const prevFocus = focusInstant;
+        focusInstant = true;
         new google.maps.event.trigger(locationObjects.get(starting_location_id).marker, "click", {});
+        focusInstant = prevFocus;
+    }
+    const homeButton = createHomeButton(map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_CENTER], startingPosition, startingZoom);
+    centerControlDiv.appendChild(homeButton);
+
+}
+
+function selectLocation(location_id){
+    new google.maps.event.trigger(locationObjects.get(location_id).marker, "click", {})
+}
+
+let focusInstant = true;
+function focusLocation(location_id){
+    if (location_id && locationObjects.has(location_id)) {
+        const obj = locationObjects.get(location_id);
+        let location = obj.location;
+        let marker = obj.marker;
+
+        infowindow.close();
+        infowindow.setContent(makeWindowContent(location));
+        scrollToLocationInList(location_id);
+        window.history.replaceState({}, document.title, get_map_with_location_url(location_id));
+        const outcome =  fetchResource(get_location_data_url(location.location_id))
+        .then((response) => response.json())
+        .then((data) => {
+            infowindow.setContent(makeWindowContent(location, data))
+        }).then(infowindow.open(map, marker));
+        starting_location_id = location_id;
     }
 
+
+}
+
+function scrollToLocationInList(location_id){
+    if (location_id) {
+        const studyspotsListObj = document.getElementById("studyspots-list-item" + location_id);
+        if (studyspotsListObj) {
+            let behavior = focusInstant ? "auto" : "smooth";
+            studyspotsListObj.scrollIntoView({behavior: behavior,  block: "start", inline: "nearest"});
+        }
+
+    }
 }
 
 function makeWindowContent(location, data = null) {
@@ -163,12 +197,8 @@ function formatPostLinks(location, data) {
     return output;
 }
 
-//   function placeMarkerAndPanTo(latLng, map) {
-//     new PinElement({
-//     position: latLng,
-//     map: map,
-//   });
-//   map.panTo(latLng);
-// }
+
 
 window.initMap = initMap;
+
+

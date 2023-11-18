@@ -29,10 +29,16 @@ SECRET_KEY = os.environ.get(
 IS_HEROKU_APP = "DYNO" in os.environ and "CI" not in os.environ
 
 if not IS_HEROKU_APP:
+<<<<<<< HEAD
     DEBUG = False
 elif 'DEBUG' in os.environ and os.environ['DEBUG'] == 'False':
     DEBUG = False
 
+=======
+    DEBUG = True
+elif 'DEBUG' in os.environ and os.environ['DEBUG'] == 'True':
+    DEBUG = True
+>>>>>>> c0c284b162135ec1b6815f1b5cbf954a62ae8439
 if IS_HEROKU_APP:
     ALLOWED_HOSTS = ["*"]
 else:

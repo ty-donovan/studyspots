@@ -8,10 +8,9 @@
         src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script>
     const is_authenticated = '{{ user.is_authenticated }}'==='True';
-    console.log(is_authenticated)
     const add_studyspot_icon = "{% static 'studyspots/map/img/add-studyspot.svg' %}"
     const home_icon = "{% static 'studyspots/map/img/go-home.svg' %}"
-    const starting_location_id = [{{ starting_location_id }}][0];
+    let starting_location_id = [{{ starting_location_id }}][0];
     function get_location_data_url(location_id){
         return "{% url 'studyspots:get_spot' %}?location="+location_id;
     }
@@ -20,6 +19,9 @@
     }
     function get_add_with_location_url(location_id){
         return "{% url 'studyspots:add' %}?location="+location_id;
+    }
+    function get_map_with_location_url(location_id){
+        return "{% url 'studyspots:map' %}?location="+location_id;
     }
     const map_url = "{% url 'studyspots:map'%}"
 </script>
@@ -31,7 +33,31 @@
     <div class="row h-100  d-flex">
         <div class="col-md-4 d-none d-lg-block">
             <div class="content-box">
-
+                <div class="panel-heading container"><h3 class="panel-title">Study Spots List</h3></div>
+                <div class="list-container panel-primary">
+                    <ul class="list-group list-constraint" id="studyspots-list">
+                    {% if not location_objs %}
+                        <li class="list-group-item"> Nothing here yet.
+                            <a href="{% url 'studyspots:add' %}" class="font-weight-bold">Add a spot</a>!
+                        </li>
+                    {% else %}
+                        {% for location_obj in location_objs %}
+                            <li class="list-group-item" id="studyspots-list-item{{ location_obj.location_id }}">
+                                <a onclick="selectLocation({{ location_obj.location_id }})" class="font-weight-bold">{{ location_obj.name }}</a>
+                                <ol class="">
+                                {% for space_obj in space_objs %}
+                                    {% if space_obj.location_id == location_obj %}
+                                        <li>
+                                            <a href="{% url 'studyspots:get_spot' %}?location={{ location_obj.location_id }}&space={{ space_obj.location_ordinal }}" class="font-weight-bold">{{ space_obj.name }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                </ol>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="col-md-8 d-lg-block flex-grow-1">
