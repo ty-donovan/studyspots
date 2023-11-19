@@ -1,5 +1,5 @@
 from django import forms
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MinLengthValidator, MaxValueValidator
 from django.shortcuts import render
 
 from .models import Location
@@ -42,6 +42,13 @@ CROWDEDNESS_RATING_CHOICES = [
 ]
 
 
+class LocationSelection(forms.Form):
+    selected_location = forms.IntegerField(
+        widget=forms.HiddenInput,
+        min_value=-1,
+        validators=[MinValueValidator]
+)
+
 class NewLocationForm(forms.Form):
     # These are the fields to add a location
     locationName = forms.CharField(
@@ -71,6 +78,7 @@ class NewLocationForm(forms.Form):
 
 
 class NewStudySpaceForm(forms.Form):
+
     studySpaceName = forms.CharField(
         label='Name of Spot',
         max_length=100,
@@ -93,21 +101,25 @@ class NewStudySpaceForm(forms.Form):
     )
     overall_rating = forms.ChoiceField(
         choices=OVERALL_RATING_CHOICES,
+        initial=3,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     comfort_rating = forms.ChoiceField(
         choices=COMFORT_RATING_CHOICES,
+        initial=3,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     noise_level_rating = forms.ChoiceField(
         choices=NOISE_RATING_CHOICES,
+        initial=3,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )
     crowdedness_rating = forms.ChoiceField(
         choices=CROWDEDNESS_RATING_CHOICES,
+        initial=3,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True  # Mark the field as required
     )

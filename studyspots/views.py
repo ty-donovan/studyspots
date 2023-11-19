@@ -70,39 +70,42 @@ def add(request):
     key = settings.GOOGLE_API_KEY
     error_message = None
     if request.method == 'POST':
-        selected_location = request.POST['existing_location']
+        location_id = None
+        print(request.POST)
+        selected_location_form = LocationSelection(request.POST, prefix="selector")
+        if selected_location_form.is_valid():
+            location_id = int(selected_location_form.cleaned_data['selected_location'])
+        else:
+            error_message = "Select a location"
         pending_location = None
-        if selected_location:
-            location_id = int(selected_location)
-        else:
-            location_id = -1
-        if location_id == -1:
-            new_location_form = NewLocationForm(request.POST, prefix="new_location")
-            if new_location_form.is_valid():
-                # Get the coordinates from the form
-                lat = new_location_form.cleaned_data['lat']
-                lng = new_location_form.cleaned_data['lng']
-                # Check if the location is within a 10-mile radius of the University of Virginia
-                location_point = (lat, lng)
-                uva_point = (STARTING_POS['lat'], STARTING_POS['lng'])
-                distance = geopy.distance.distance(uva_point, location_point).miles
+        if error_message is None:
+            if location_id == -1:
+                new_location_form = NewLocationForm(request.POST, prefix="new_location")
+                if new_location_form.is_valid():
+                    # Get the coordinates from the form
+                    lat = new_location_form.cleaned_data['lat']
+                    lng = new_location_form.cleaned_data['lng']
+                    # Check if the location is within a 10-mile radius of the University of Virginia
+                    location_point = (lat, lng)
+                    uva_point = (STARTING_POS['lat'], STARTING_POS['lng'])
+                    distance = geopy.distance.distance(uva_point, location_point).miles
 
-                if distance <= 10:
-                    # Location is within the 10-mile radius, proceed to save
-                    pending_location = PendingLocation(
-                        name=new_location_form.cleaned_data['locationName'],
-                        location_type=new_location_form.cleaned_data['location_type'],
-                        on_grounds=new_location_form.cleaned_data['on_grounds'],
-                        lat=lat,
-                        lng=lng
-                    )
+                    if distance <= 10:
+                        # Location is within the 10-mile radius, proceed to save
+                        pending_location = PendingLocation(
+                            name=new_location_form.cleaned_data['locationName'],
+                            location_type=new_location_form.cleaned_data['location_type'],
+                            on_grounds=new_location_form.cleaned_data['on_grounds'],
+                            lat=lat,
+                            lng=lng
+                        )
+                    else:
+                        # Location is outside the 10-mile radius
+                        error_message = "Location must be closer to the University of Virginia."
                 else:
-                    # Location is outside the 10-mile radius
-                    error_message = "Location must be closer to the University of Virginia."
+                    error_message = "Invalid form data: you must move the pin from its original position"
             else:
-                error_message = "Invalid form data: you must move the pin from its original position"
-        else:
-            pending_location = Location.objects.get(pk=location_id)
+                pending_location = Location.objects.get(pk=location_id)
         if error_message is None:
             new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
             if new_studyspace_form.is_valid():
@@ -128,6 +131,7 @@ def add(request):
                 error_message = "Invalid Study Spot data"
             # error messages fall through to here
             context = {
+                'selected_location_form': selected_location_form,
                 'starting_location': location_id,
                 'locations': locations_json,
                 'make_new_location_label': new_location_label,
@@ -135,12 +139,13 @@ def add(request):
                 'new_studyspace_form': new_studyspace_form,
                 'error_message': error_message,
             }
-            return render(request, 'studyspots/add.html', context)
+            return HttpResponseRedirect(reverse('studyspots:add')+'?location='+location_id, context)
         else:
             new_location_form = NewLocationForm(prefix="new_location")
             new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
             location_id = request.GET.get('location', None)
         context = {
+            'selected_location_form': selected_location_form,
             'starting_location': location_id,
             'locations': locations_json,
             'make_new_location_label': new_location_label,
@@ -151,10 +156,12 @@ def add(request):
         }
         return render(request, 'studyspots/add.html', context)
     else:
+        selected_location_form = LocationSelection(prefix='selector')
         new_location_form = NewLocationForm(prefix="new_location")
         new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
         location_id = request.GET.get('location', None)
     context = {
+        'selected_location_form': selected_location_form,
         'starting_location': location_id,
         'locations': locations_json,
         'make_new_location_label': new_location_label,
@@ -324,8 +331,8 @@ def pending(request):
 
 class PendingAction(IntEnum):
     NO_ACTION = 0
-    REJECT = 1
-    APPROVE = 2
+    APPROVE = 1
+    REJECT = 2
 
 
 @login_required
@@ -370,7 +377,7 @@ def approve_pending(request):
         )
         new_studyspace.save()
         pending_studyspace.delete()
-        return render(request, 'studyspots/reviewConfirmation.html', {'action': PendingAction.APPROVE})
+        return render(request, 'studyspots/reviewConfirmation.html', {'action': int(PendingAction.APPROVE)})
 
 
 @login_required
@@ -387,7 +394,7 @@ def reject_pending(request):
     else:
         pending_studyspace.delete()
 
-    return render(request, 'studyspots/reviewConfirmation.html', {'action': PendingAction.REJECT})
+    return render(request, 'studyspots/reviewConfirmation.html', {'action': int(PendingAction.REJECT)})
 
 
 def reviewConfirmation(request):
