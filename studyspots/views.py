@@ -1,14 +1,12 @@
-from collections import OrderedDict
 from enum import IntEnum
 from json import JSONDecodeError
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.http import *
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import json
 import geopy.distance
-from rest_framework.utils.serializer_helpers import ReturnList
 
 from .forms import *
 
@@ -64,20 +62,15 @@ def map_redirect(request):
     return redirect(reverse("studyspots:map"), permanent=True)
 
 
-# this is a mess rn
 @login_required()
 def add(request):
-    new_location_form, new_studyspace_form = None, None
     locations = LocationSerializer(Location.objects.all(), many=True).data
     new_location_label = "-- Add new location --"
     locations_json = json.dumps(locations)
     key = settings.GOOGLE_API_KEY
     error_message = None
-    # new_studyspace_form.location_form.initial = Location.objects.get(location_id=location_id)
     if request.method == 'POST':
-        print(request.POST)
         selected_location = request.POST['existing_location']
-        print(selected_location)
         pending_location = None
         if selected_location:
             location_id = int(selected_location)
@@ -110,38 +103,30 @@ def add(request):
                 error_message = "Invalid form data: you must move the pin from its original position"
         else:
             pending_location = Location.objects.get(pk=location_id)
-        new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
-        if new_studyspace_form.is_valid():
-            pending_space = PendingStudySpace(
-                name=new_studyspace_form.cleaned_data['studySpaceName'],
-                capacity=new_studyspace_form.cleaned_data['capacity'],
-                comments=[new_studyspace_form.cleaned_data['comment']],
-                overall_ratings=[int(new_studyspace_form.cleaned_data['overall_rating'])],
-                comfort_ratings=[int(new_studyspace_form.cleaned_data['comfort_rating'])],
-                noise_level_ratings=[int(new_studyspace_form.cleaned_data['noise_level_rating'])],
-                crowdedness_ratings=[int(new_studyspace_form.cleaned_data['crowdedness_rating'])],
-            )
-            if location_id != -1:
-                pending_space.content_type = ContentType.objects.get(model="location")
-                pending_space.object_id = location_id
-            else:
-                pending_space.content_type = ContentType.objects.get(model="pendinglocation")
-                pending_location.save()
-                pending_space.object_id = pending_location.location_id
-            if error_message or not new_location_form.is_valid() or not new_studyspace_form.is_valid():
-                context = {
-                    'starting_location': location_id,
-                    'locations': locations_json,
-                    'make_new_location_label': new_location_label,
-                    'key': key,
-                    'new_studyspace_form': new_studyspace_form,
-                    'error_message': error_message,
-                }
-                return render(request, reverse('studyspots:add') + f'?location={location_id}', context)
-            else:
+        if error_message is None:
+            new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
+            if new_studyspace_form.is_valid():
+                pending_space = PendingStudySpace(
+                    name=new_studyspace_form.cleaned_data['studySpaceName'],
+                    capacity=new_studyspace_form.cleaned_data['capacity'],
+                    comments=[new_studyspace_form.cleaned_data['comment']],
+                    overall_ratings=[int(new_studyspace_form.cleaned_data['overall_rating'])],
+                    comfort_ratings=[int(new_studyspace_form.cleaned_data['comfort_rating'])],
+                    noise_level_ratings=[int(new_studyspace_form.cleaned_data['noise_level_rating'])],
+                    crowdedness_ratings=[int(new_studyspace_form.cleaned_data['crowdedness_rating'])],
+                )
+                if location_id != -1:
+                    pending_space.content_type = ContentType.objects.get(model="location")
+                    pending_space.object_id = location_id
+                else:
+                    pending_space.content_type = ContentType.objects.get(model="pendinglocation")
+                    pending_location.save()
+                    pending_space.object_id = pending_location.location_id
                 pending_space.save()
-            return redirect(reverse("studyspots:confirmation"))
-        else:
+                return redirect(reverse("studyspots:confirmation"))
+            else:
+                error_message = "Invalid Study Spot data"
+            # error messages fall through to here
             context = {
                 'starting_location': location_id,
                 'locations': locations_json,
@@ -151,6 +136,20 @@ def add(request):
                 'error_message': error_message,
             }
             return render(request, 'studyspots/add.html', context)
+        else:
+            new_location_form = NewLocationForm(prefix="new_location")
+            new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
+            location_id = request.GET.get('location', None)
+        context = {
+            'starting_location': location_id,
+            'locations': locations_json,
+            'make_new_location_label': new_location_label,
+            'key': key,
+            'new_location_form': new_location_form,
+            'new_studyspace_form': new_studyspace_form,
+            'error_message': error_message,
+        }
+        return render(request, 'studyspots/add.html', context)
     else:
         new_location_form = NewLocationForm(prefix="new_location")
         new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
@@ -200,7 +199,6 @@ def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_nam
                 setattr(obj, k, v)
             obj.save()
             added_objects.append(getattr(obj, id_var_name))
-    json_response = None
     if len(added_objects) == 0:
         json_response = dict({"Warning": f"No {name_plural} added. Already in database"})
     elif len(added_objects) == 1:
@@ -243,6 +241,7 @@ def get_spot(request):
 
 
 # method to render a form to add a pending for a study spot
+@login_required
 def review_studyspace(request):
     """
     Render the pending form for a specific study space.
@@ -329,6 +328,7 @@ class PendingAction(IntEnum):
     APPROVE = 2
 
 
+@login_required
 def approve_pending(request):
     studyspace_id = get_variable(request, "studyspot")
     if not studyspace_id:
@@ -373,6 +373,7 @@ def approve_pending(request):
         return render(request, 'studyspots/reviewConfirmation.html', {'action': PendingAction.APPROVE})
 
 
+@login_required
 def reject_pending(request):
     studyspace_id = get_variable(request, 'studyspot')
     if not studyspace_id:
