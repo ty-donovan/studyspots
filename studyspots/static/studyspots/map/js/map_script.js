@@ -8,7 +8,7 @@ function getUrl(url = "/") {
     if (!url.startsWith("/")) {
         url = "/" + url;
     }
-    return "http://" + window.location.host + url;
+    return window.origin + url;
 }
 
 function fetchResource(url) {
