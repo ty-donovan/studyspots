@@ -7,8 +7,8 @@
     {%  if starting_location %}
     const startingLocation = [{{ starting_location }}][0];
     {% endif %}
-    const makeNewLocationLabel = "{{ make_new_location_label|safe }}";
-    let locations = [{{ locations|safe }}][0];
+    const makeNewLocationLabel = '{{ make_new_location_label }}';
+    let locations = JSON.parse('{{ locations | escapejs }}');
     locations.sort((a, b) => a.name.localeCompare(b.name));
     locations.push({location_id: -1, name: makeNewLocationLabel})
 </script>
@@ -58,7 +58,6 @@
                         <div class="text-center">
                             <input type="submit" class="btn btn-primary mt-3" value="Submit Spot for Approval">
                         </div>
-                        <p class="text-danger mt-3">{{ error_message }}</p>
                         {% if error_message %}
                             <p class="text-danger mt-3">{{ error_message }}</p>
                         {% endif %}
@@ -66,9 +65,13 @@
                 </div>
             </div>
             <script>
+                function get_map_add_with_location_url(location_id){
+                    return "{% url 'studyspots:add' %}?location="+location_id;
+                }
                 let locationSelect = document.getElementById('existing-location-select');
                 let newLocationForm = document.getElementById('new-location-form');
                 locationSelect.addEventListener('change', function() {
+                    window.history.replaceState({}, document.title, get_map_add_with_location_url(locationSelect.value));
                     if(locationSelect.value === '-1'){
                         toggleLocationForm(true);
                     }else{

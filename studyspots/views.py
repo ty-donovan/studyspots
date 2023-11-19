@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from enum import IntEnum
 from json import JSONDecodeError
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -14,6 +15,7 @@ from .forms import *
 from django.urls import reverse
 
 from studyspots.models import *
+from .settings import STARTING_POS
 
 
 def is_ajax(request):
@@ -50,7 +52,7 @@ def map(request):
     locations_json = json.dumps(locations)
     context = {
         'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id,
-        'location_objs': location_objs, 'space_objs': space_objs
+        'location_objs': location_objs, 'space_objs': space_objs, 'latlng': json.dumps(STARTING_POS)
     }
     return render(request, 'studyspots/map.html', context)
 
@@ -87,10 +89,9 @@ def add(request):
                 # Get the coordinates from the form
                 lat = new_location_form.cleaned_data['lat']
                 lng = new_location_form.cleaned_data['lng']
-
                 # Check if the location is within a 10-mile radius of the University of Virginia
                 location_point = (lat, lng)
-                uva_point = (38.0356, -78.5034)  # UVA coordinates
+                uva_point = (STARTING_POS['lat'], STARTING_POS['lng'])
                 distance = geopy.distance.distance(uva_point, location_point).miles
 
                 if distance <= 10:
@@ -109,11 +110,8 @@ def add(request):
                 error_message = "Invalid form data: you must move the pin from its original position"
         else:
             pending_location = Location.objects.get(pk=location_id)
-        if error_message:
-            print(error_message)
         new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
-        if new_studyspace_form.is_valid() and new_studyspace_form.cleaned_data['capacity'] > 0:
-            print(location_id)
+        if new_studyspace_form.is_valid():
             pending_space = PendingStudySpace(
                 name=new_studyspace_form.cleaned_data['studySpaceName'],
                 capacity=new_studyspace_form.cleaned_data['capacity'],
@@ -130,8 +128,7 @@ def add(request):
                 pending_space.content_type = ContentType.objects.get(model="pendinglocation")
                 pending_location.save()
                 pending_space.object_id = pending_location.location_id
-                print(pending_location)
-            if error_message:
+            if error_message or not new_location_form.is_valid() or not new_studyspace_form.is_valid():
                 context = {
                     'starting_location': location_id,
                     'locations': locations_json,
@@ -140,17 +137,11 @@ def add(request):
                     'new_studyspace_form': new_studyspace_form,
                     'error_message': error_message,
                 }
-                return render(request, 'studyspots/add.html', context)
+                return render(request, reverse('studyspots:add') + f'?location={location_id}', context)
             else:
-                print(pending_space)
                 pending_space.save()
             return redirect(reverse("studyspots:confirmation"))
         else:
-            if new_studyspace_form.cleaned_data['capacity'] < 1:
-                error_message = "Invalid capacity number"
-                new_studyspace_form.cleaned_data['capacity'] = 1
-            else:
-                error_message = "Invalid study spot data"
             context = {
                 'starting_location': location_id,
                 'locations': locations_json,
@@ -332,6 +323,12 @@ def pending(request):
     return render(request, 'studyspots/pendingDetail.html', context)
 
 
+class PendingAction(IntEnum):
+    NO_ACTION = 0
+    REJECT = 1
+    APPROVE = 2
+
+
 def approve_pending(request):
     studyspace_id = get_variable(request, "studyspot")
     if not studyspace_id:
@@ -373,10 +370,13 @@ def approve_pending(request):
         )
         new_studyspace.save()
         pending_studyspace.delete()
-        return render(request, 'studyspots/reviewConfirmation.html')
+        return render(request, 'studyspots/reviewConfirmation.html', {'action': PendingAction.APPROVE})
 
 
-def reject_pending(request, studyspace_id):
+def reject_pending(request):
+    studyspace_id = get_variable(request, 'studyspot')
+    if not studyspace_id:
+        redirect(reverse('studyspots:pending'), False)
     pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
     if pending_studyspace.content_type.model == 'pendinglocation':
         pending_location_id = pending_studyspace.object_id
@@ -386,7 +386,7 @@ def reject_pending(request, studyspace_id):
     else:
         pending_studyspace.delete()
 
-    return render(request, 'studyspots/reviewConfirmation.html')
+    return render(request, 'studyspots/reviewConfirmation.html', {'action': PendingAction.REJECT})
 
 
 def reviewConfirmation(request):

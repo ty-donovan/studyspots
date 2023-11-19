@@ -102,7 +102,7 @@ function createHomeButton(mapControls, startingPosition, startingZoom) {
 
 
 function initMap() {
-    const startingPosition = new google.maps.LatLng(38.0356, -78.5034);
+
     const startingZoom = 17;
     map = new google.maps.Map(document.getElementById("map"), {
         mapId: "86be248947f98a57",

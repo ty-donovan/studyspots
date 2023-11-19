@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import MinValueValidator
 from django.shortcuts import render
 
 from .models import Location
@@ -61,6 +62,7 @@ class NewLocationForm(forms.Form):
     lat = forms.DecimalField(
         widget=forms.HiddenInput(attrs={'class': 'form-control'}),
         required=True  # Mark the field as required
+
     )
     lng = forms.DecimalField(
         widget=forms.HiddenInput(attrs={'class': 'form-control'}),
@@ -79,6 +81,8 @@ class NewStudySpaceForm(forms.Form):
         label='Capacity',
         widget=forms.NumberInput(attrs={'class': 'form-control'}),
         max_value=1000,
+        min_value=1,
+        validators=[MinValueValidator],
         required=True  # Mark the field as required
     )
     comment = forms.CharField(
