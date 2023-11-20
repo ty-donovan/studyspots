@@ -402,6 +402,7 @@ def reviewConfirmation(request):
 
 
 def change_location(request):
+    key = settings.GOOGLE_API_KEY
     studyspace_id = get_variable(request, 'studyspot')
     if not studyspace_id:
         return redirect(reverse('studyspots:pending'), False)
@@ -409,17 +410,21 @@ def change_location(request):
     if pending_studyspace.content_type.model == 'pendinglocation':
         pending_location_id = pending_studyspace.object_id
         pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
+        pending_lat = pending_location.lat
+        pending_lng = pending_location.lng
         if request.method == 'POST':
             new_studyspace_form = NewStudySpaceForm(request.POST, prefix='pending_studyspace')
             new_location_form = NewLocationForm(request.POST, prefix='pending_location')
             if new_studyspace_form.is_valid():
                 new_location_form.is_valid()
+                lat = new_location_form.cleaned_data['lat']
+                lng = new_location_form.cleaned_data['lng']
                 edit_pending_location = PendingLocation(
                     name=new_location_form.cleaned_data['locationName'],
                     location_type=new_location_form.cleaned_data['location_type'],
                     on_grounds=new_location_form.cleaned_data['on_grounds'],
-                    lat=pending_location.lat,
-                    lng=pending_location.lng,
+                    lat=lat,
+                    lng=lng,
                 )
                 edit_pending_location.save()
                 pending_location.delete()
@@ -439,6 +444,8 @@ def change_location(request):
                 return redirect('studyspots:reviewConfirmation')
     else:
         pending_location = None
+        pending_lat = None
+        pending_lng = None
         new_location_form = None
         if request.method == 'POST':
             new_studyspace_form = NewStudySpaceForm(request.POST)
@@ -462,6 +469,9 @@ def change_location(request):
         'pending_studyspace': pending_studyspace,
         'new_location_form': new_location_form,
         'pending_location': pending_location,
+        'key': key,
+        'pending_lat': pending_lat,
+        'pending_lng': pending_lng,
                }
     return render(request, 'studyspots/change_location.html', context)
 
