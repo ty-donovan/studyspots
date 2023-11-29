@@ -44,13 +44,22 @@ def confirmation(request):
 def map(request):
     starting_location_id = request.GET.get('location', "null")
     key = settings.GOOGLE_API_KEY
-    location_objs = Location.objects.all().filter(studyspace__isnull=False).distinct().order_by("name")
-    space_objs = StudySpace.objects.all().order_by("location_id").order_by("name")
+    location_objs_dict = {}
+    objs_first = True
+    location_objs = Location.objects.all().distinct().order_by("name")
+    for location in location_objs:
+        location_dict = LocationSerializer(location).data
+        studyspace_objs = {}
+        for studyspace in location.studyspace_set.all().order_by("name"):
+            studyspace_objs.update({studyspace.name: StudySpaceSerializer(studyspace).data})
+        location_dict.update({"set": studyspace_objs})
+        location_objs_dict.update({location.location_id: location_dict})
+    print(location_objs_dict)
     locations = LocationSerializer(Location.objects.all(), many=True).data
     locations_json = json.dumps(locations)
     context = {
         'key': key, 'locations': locations_json, 'starting_location_id': starting_location_id,
-        'location_objs': location_objs, 'space_objs': space_objs, 'latlng': json.dumps(STARTING_POS)
+        'location_objs': location_objs_dict.values(), 'latlng': json.dumps(STARTING_POS)
     }
     return render(request, 'studyspots/map.html', context)
 
@@ -152,6 +161,7 @@ def add(request):
             'key': key,
             'new_location_form': new_location_form,
             'new_studyspace_form': new_studyspace_form,
+            'latlng': json.dumps(STARTING_POS),
             'error_message': error_message,
         }
         return render(request, 'studyspots/add.html', context)
@@ -168,6 +178,7 @@ def add(request):
         'key': key,
         'new_location_form': new_location_form,
         'new_studyspace_form': new_studyspace_form,
+        'latlng': json.dumps(STARTING_POS),
         'error_message': error_message,
     }
     return render(request, 'studyspots/add.html', context)
@@ -401,6 +412,7 @@ def reviewConfirmation(request):
     return render(request, 'studyspots/reviewConfirmation.html')
 
 
+@login_required()
 def change_location(request):
     key = settings.GOOGLE_API_KEY
     studyspace_id = get_variable(request, 'studyspot')

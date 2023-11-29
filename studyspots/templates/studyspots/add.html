@@ -11,6 +11,7 @@
     let locations = JSON.parse('{{ locations | escapejs }}');
     locations.sort((a, b) => a.name.localeCompare(b.name));
     locations.push({location_id: -1, name: makeNewLocationLabel})
+    const startingPosition = JSON.parse('{{ latlng | escapejs }}');
 </script>
 <body>
     <div class="container mt-5">
@@ -115,14 +116,13 @@
                     {% endif %}
                 }
                 function initMap() {
-                    var initialLocation = { lat: 38.0356, lng: -78.5034 }; // Default initial location (University of Virginia)
                     map = new google.maps.Map(document.getElementById("map"), {
-                          center: initialLocation,
+                          center: startingPosition,
                           zoom: 17,
                     });
                     // Create a draggable marker
                     marker = new google.maps.Marker({
-                        position: initialLocation,
+                        position: startingPosition,
                         map: map,
                         draggable: true
                     });
