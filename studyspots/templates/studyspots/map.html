@@ -45,20 +45,22 @@
                         {% for location_obj in location_objs %}
                             <li class="list-group-item" id="studyspots-list-item{{ location_obj.location_id }}">
                                 <a onclick="selectLocation({{ location_obj.location_id }})" class="font-weight-bold">{{ location_obj.name }}</a>
-                                <ol class="">
-
                                 {% if location_obj.set %}
+                                    <ol class="">
                                     {% for space_obj in location_obj.set.values %}
                                         <li>
                                             <a href="{% url 'studyspots:get_spot' %}?location={{ location_obj.location_id }}&space={{ space_obj.location_ordinal }}" class="font-weight-bold">{{ space_obj.name }}</a>
                                         </li>
                                     {% endfor %}
+                                    </ol>
                                 {% else %}
-                                    <li>
-                                         <a href="{% url 'studyspots:add' %}?location={{ location_obj.location_id }}" class="font-weight-bold">Add a spot</a>!
-                                    </li>
+                                    <ul>
+                                        <li>
+                                             <a href="{% url 'studyspots:add' %}?location={{ location_obj.location_id }}" class="font-weight-bold">Add a spot</a>
+                                        </li>
+                                    </ul>
                                 {% endif %}
-                                </ol>
+
                             </li>
                         {% endfor %}
                     {% endif %}
