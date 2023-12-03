@@ -49,7 +49,7 @@
                 </div>
             </nav>
         </header>
-
+        {% load versioning %}
         <!-- This tells django where other pages main content will go -->
         <div class="row flex-grow-1 container-fluid mt-4 mb-4">
             {% block content %}
@@ -70,6 +70,7 @@
                         <p class="mb-0 footer-text">Privacy Policy</p>
                         <p class="mb-0 footer-text">Contact Us</p>
                     </div>
+                    {% git_hash %}
                 </div>
             </div>
         </footer>

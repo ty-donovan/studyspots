@@ -9,3 +9,4 @@ googlemaps
 dj-config-url
 djangorestframework
 geopy
+GitPython
