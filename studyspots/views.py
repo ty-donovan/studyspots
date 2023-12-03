@@ -377,7 +377,7 @@ def approve_pending(request):
         new_studyspace.save()
         pending_studyspace.delete()
         pending_studyspace.location.delete()
-        return render(request, 'studyspots/reviewConfirmation.html')
+        return render(request, 'studyspots/reviewConfirmation.html', {'action': int(PendingAction.APPROVE)})
     else:
         new_studyspace = StudySpace(
             location_id=pending_studyspace.location,
