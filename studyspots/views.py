@@ -197,6 +197,43 @@ def load(request):
         return HttpResponseNotFound()
 
 
+def __load_subprocess_location(filename, name="object", name_plural=None, id_var_name="id"):
+    if name_plural is None:
+        name_plural = name + "s"
+    with open(filename) as json_file:
+        try:
+            objects = json.load(json_file)
+        except JSONDecodeError as e:
+            e.msg += "Formatting error with json file"
+            raise e
+
+    added_objects = []
+    for object_dict in objects:
+        if Location.objects.filter(
+                **{
+                    f'{id_var_name}': int(object_dict[str(id_var_name)])
+                }
+        ).count() == 0:
+            obj = Location()
+            print(object_dict.items())
+            for k, v in object_dict.items():
+                if k != id_var_name:
+                    print(type(k))
+                    setattr(obj, k, v)
+                else:
+                    print(k)
+            obj.save()
+            added_objects.append(getattr(obj, id_var_name))
+    if len(added_objects) == 0:
+        json_response = dict({"Warning": f"No {name_plural} added. Already in database"})
+    elif len(added_objects) == 1:
+        json_response = dict({"Success": f"Added {name} {added_objects[0]}"})
+    else:
+        json_response = dict({"Success": f"Added {name_plural} {str(added_objects).replace('[', '').replace(']', '')}"})
+    json_response = {f'{name.title()}': f'{json_response}'}
+    return json_response
+
+
 def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_name="id"):
     if name_plural is None:
         name_plural = name + "s"

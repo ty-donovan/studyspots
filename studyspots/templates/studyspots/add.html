@@ -67,12 +67,6 @@
                 </div>
             </div>
             <script>
-                {% if starting_location %}
-                    document.getElementById('submit-button').disabled = false;
-                    document.getElementById("id_selector-selected_location").value = startingLocation.value;
-                {% else %}
-                   document.getElementById('submit-button').disabled = true;
-                {% endif %}
                 function get_map_add_with_location_url(location_id){
                     return "{% url 'studyspots:add' %}?location="+location_id;
                 }
@@ -114,11 +108,15 @@
                 let marker;
                 function callback(){
                     {% if starting_location %}
+                        document.getElementById('submit-button').disabled = false;
+                        document.getElementById("id_selector-selected_location").value = startingLocation;
                         if(startingLocation === -1){
                             toggleLocationForm(true);
                         }else{
                             toggleLocationForm(false);
                         }
+                    {% else %}
+                        document.getElementById('submit-button').disabled = true;
                     {% endif %}
                 }
                 function initMap() {
