@@ -19,7 +19,7 @@
         return "{% url 'studyspots:get_spot' %}?location="+location_id+"&space="+studyspace_id;
     }
     function get_add_with_location_url(location_id){
-        return "{% url 'studyspots:add' %}";
+        return "{% url 'studyspots:add' %}?location="+location_id;
     }
     function get_map_with_location_url(location_id){
         return "{% url 'studyspots:map' %}?location="+location_id;
