@@ -4,8 +4,8 @@
 {% load bootstrap5 %}
 <link rel="stylesheet" href="{% static 'studyspots/style.css' %}">
 <script>
-    {%  if starting_location %}
-    const startingLocation = [{{ starting_location }}][0];
+    {% if starting_location %}
+        const startingLocation = [{{ starting_location }}][0];
     {% endif %}
     const makeNewLocationLabel = '{{ make_new_location_label }}';
     let locations = JSON.parse('{{ locations | escapejs }}');
@@ -26,9 +26,9 @@
                         <div class="col">
                             <h3>Choose Location:</h3>
                             <div class="col-6 mx-auto">
-                            {{ selected_location_form }}
+                                {% bootstrap_form selected_location_form %}
                                 <select name="existing_location" id="existing-location-select" class="form-select form-select-med">
-                                    <option id="defaultOption" disabled selected>Select an existing location</option>
+                                    <option id="defaultOption" selected>Select an existing location</option>
                                     <script>
                                         {% if starting_location %}
                                         let defaultOption = document.getElementById('defaultOption');
@@ -61,12 +61,18 @@
                         <h3>Add Spot:</h3>
                         {% bootstrap_form new_studyspace_form %}
                         <div class="text-center">
-                            <input type="submit" class="btn btn-primary mt-3" id="submit-button" disabled value="Submit Spot for Approval">
+                            <input type="submit" class="btn btn-primary mt-3" id="submit-button" value="Submit Spot for Approval">
                         </div>
                     </div>
                 </div>
             </div>
             <script>
+                {% if starting_location %}
+                    document.getElementById('submit-button').disabled = false;
+                    document.getElementById("id_selector-selected_location").value = startingLocation.value;
+                {% else %}
+                   document.getElementById('submit-button').disabled = true;
+                {% endif %}
                 function get_map_add_with_location_url(location_id){
                     return "{% url 'studyspots:add' %}?location="+location_id;
                 }

@@ -80,8 +80,9 @@ def add(request):
     error_message = None
     if request.method == 'POST':
         location_id = None
-        print(request.POST)
         selected_location_form = LocationSelection(request.POST, prefix="selector")
+        new_location_form = NewLocationForm(request.POST, prefix="new_location")
+        new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
         if selected_location_form.is_valid():
             location_id = int(selected_location_form.cleaned_data['selected_location'])
         else:
@@ -89,7 +90,6 @@ def add(request):
         pending_location = None
         if error_message is None:
             if location_id == -1:
-                new_location_form = NewLocationForm(request.POST, prefix="new_location")
                 if new_location_form.is_valid():
                     # Get the coordinates from the form
                     lat = new_location_form.cleaned_data['lat']
@@ -116,7 +116,6 @@ def add(request):
             else:
                 pending_location = Location.objects.get(pk=location_id)
         if error_message is None:
-            new_studyspace_form = NewStudySpaceForm(request.POST, prefix="new_studyspace")
             if new_studyspace_form.is_valid():
                 pending_space = PendingStudySpace(
                     name=new_studyspace_form.cleaned_data['studySpaceName'],
@@ -150,8 +149,10 @@ def add(request):
             }
             return HttpResponseRedirect(reverse('studyspots:add')+'?location='+location_id, context)
         else:
-            new_location_form = NewLocationForm(prefix="new_location")
-            new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
+            if not new_location_form:
+                new_location_form = NewLocationForm(prefix="new_location")
+            if not new_studyspace_form:
+                new_studyspace_form = NewStudySpaceForm(prefix="new_studyspace")
             location_id = request.GET.get('location', None)
         context = {
             'selected_location_form': selected_location_form,
@@ -344,6 +345,7 @@ class PendingAction(IntEnum):
     NO_ACTION = 0
     APPROVE = 1
     REJECT = 2
+    EDIT = 3
 
 
 @login_required
@@ -453,7 +455,7 @@ def change_location(request):
                 )
                 edit_pending_space.save()
                 pending_studyspace.delete()
-                return redirect('studyspots:reviewConfirmation')
+                return render(request, 'studyspots/reviewConfirmation.html',  {'action': int(PendingAction.EDIT)})
     else:
         pending_location = None
         pending_lat = None
@@ -475,7 +477,7 @@ def change_location(request):
                 )
                 edit_pending_space.save()
                 pending_studyspace.delete()
-                return redirect('studyspots:reviewConfirmation')
+                return render(request, 'studyspots/reviewConfirmation.html', {'action': int(PendingAction.EDIT)})
     context = {
         'new_studyspace_form': new_studyspace_form,
         'pending_studyspace': pending_studyspace,
@@ -483,7 +485,7 @@ def change_location(request):
         'pending_location': pending_location,
         'key': key,
         'pending_lat': pending_lat,
-        'pending_lng': pending_lng,
+        'pending_lng': pending_lng
                }
     return render(request, 'studyspots/change_location.html', context)
 
