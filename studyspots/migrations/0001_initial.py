@@ -84,6 +84,3 @@ class Migration(migrations.Migration):
             ],
         ),
     ]
-studyspots_admin
-studyspots_pendinglocation
-studyspots_pendingstudyspace
