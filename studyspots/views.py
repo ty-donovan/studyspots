@@ -215,7 +215,8 @@ def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_nam
         ).count() == 0:
             obj = cls()
             for k, v in object_dict.items():
-                setattr(obj, k, v)
+                if k != "location_id" or k != "studyspace_id":
+                    setattr(obj, k, v)
             obj.save()
             added_objects.append(getattr(obj, id_var_name))
     if len(added_objects) == 0:
