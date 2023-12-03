@@ -13,10 +13,14 @@ try:
         f.write(sha)
 except InvalidGitRepositoryError:
     try:
-        with open('staticfiles/studyspots/git-hash.txt') as f:
+        with open('studyspots/static/studyspots/git-hash.txt') as f:
             sha = f.read()
     except FileNotFoundError:
-        sha = None
+        try:
+            with open('staticfiles/studyspots/git-hash.txt') as f:
+                sha = f.read()
+        except FileNotFoundError:
+            sha = None
 
 register = template.Library()
 
