@@ -1,6 +1,7 @@
 from enum import IntEnum
 from json import JSONDecodeError
 
+from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404
 from django.http import *
 from django.contrib.auth.decorators import login_required
@@ -214,9 +215,13 @@ def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_nam
                 }
         ).count() == 0:
             obj = cls()
+            print(object_dict.items())
             for k, v in object_dict.items():
-                if k != "location_id" or k != "studyspace_id":
+                if k != id_var_name:
+                    print(type(k))
                     setattr(obj, k, v)
+                else:
+                    print(k)
             obj.save()
             added_objects.append(getattr(obj, id_var_name))
     if len(added_objects) == 0:
