@@ -474,8 +474,8 @@ def change_location(request):
             new_location_form = NewLocationForm(request.POST, prefix='pending_location')
             if new_studyspace_form.is_valid():
                 new_location_form.is_valid()
-                lat = new_location_form.cleaned_data['lat']
-                lng = new_location_form.cleaned_data['lng']
+                lat = new_location_form.cleaned_data.get('lat', pending_lat)
+                lng = new_location_form.cleaned_data.get('lng', pending_lng)
                 edit_pending_location = PendingLocation(
                     name=new_location_form.cleaned_data['locationName'],
                     location_type=new_location_form.cleaned_data['location_type'],
