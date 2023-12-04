@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
 from studyspots.models import *
+from studyspots.forms import *
+from django.http import Http404
 
 
 class LocationModelTests(TestCase):
@@ -70,7 +72,7 @@ class StudySpaceModelTests(TestCase):
             comments='nice classroom',
             overall_ratings='★ Would Not Recommend',
             comfort_ratings='Very Uncomfortable',
-            noise_level_ratings='Extremely Noisy', 
+            noise_level_ratings='Extremely Noisy',
             crowdedness_ratings='Overcrowded',
             reservable=True,
         )
@@ -163,7 +165,7 @@ class ProfileViewTests(TestCase):
         self.assertTrue(isinstance(self.user, User))
         login = self.client.login(username='username', password='password123')
         self.assertEqual(login, True)
-        
+
     def test_logout(self):
         response = self.client.get(reverse('studyspots:logout'))
         self.assertRedirects(response, '/')
@@ -174,4 +176,190 @@ class MapViewTests(TestCase):
         response = self.client.get(reverse('studyspots:map'))
         self.assertTemplateUsed(response, 'studyspots/map.html')
         self.assertEqual(response.context['key'], settings.GOOGLE_API_KEY)
-        
+
+
+class AddViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+
+    def test_add_exisiting_location(self):
+        new_location = Location(name="Clem")
+        new_pendingstudyspace = PendingStudySpace(
+            object_id=new_location.pk,
+            name='Clark 24',
+            capacity=55,
+            comments='big room',
+            overall_ratings=4,
+            comfort_ratings=3,
+            noise_level_ratings=2,
+            crowdedness_ratings=1,
+            space_type='Group Study Room',
+            reservable=False
+        )
+        self.assertEqual(new_pendingstudyspace.studyspace_id, new_pendingstudyspace.pk)
+
+    def test_add_new_location(self):
+        new_location = PendingLocation(name='Brown')
+        new_pendingstudyspace = PendingStudySpace(
+            object_id=new_location.pk,
+            name='Clark 24',
+            capacity=55,
+            comments='big room',
+            overall_ratings=4,
+            comfort_ratings=3,
+            noise_level_ratings=2,
+            crowdedness_ratings=1,
+            space_type='Group Study Room',
+            reservable=False
+        )
+        self.assertEqual(new_pendingstudyspace.studyspace_id, new_pendingstudyspace.pk)
+
+
+class GetSpotViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.getspot_url = reverse('studyspots:get_spot')
+
+    def test_get_no_location_and_ordinal(self):
+        response = self.client.get(self.getspot_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_invalid_location_and_ordinal(self):
+        response = self.client.get(self.getspot_url, {'location': 9999, 'space': 9999})
+        self.assertEqual(response.status_code, 404)
+
+
+class ReviewStudyspaceViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.review_url = reverse('studyspots:review_studyspace')
+
+    def test_review_success(self):
+        self.location = Location(
+            location_id=2
+        )
+        self.studyspace = StudySpace(
+            studyspace_id=2
+        )
+        response = self.client.get(self.review_url, {'location': self.location.location_id, 'space': self.studyspace.studyspace_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'studyspots/studyspace_form.html')
+
+    def test_review_raises_404(self):
+        response = self.client.get(self.review_url)
+        self.assertEqual(response.status_code, 404)
+
+
+class ProcessStudyspaceViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.process_review_url = reverse('studyspots:process_studyspace_review')
+
+    def test_process_success(self):
+        self.location = Location(
+            location_id=3
+        )
+        self.studyspace = StudySpace(
+            studyspace_id=3,
+            comments='Great study room'
+        )
+        response = self.client.post(self.process_review_url, {'location': self.location.location_id, 'space': self.studyspace.studyspace_id})
+        self.assertTrue(self.studyspace.comments, 'Great study room')
+
+    def test_process_invalid_params(self):
+        response = self.client.post(self.process_review_url, {'location': -1, 'space': -2})
+        self.assertEqual(response.status_code, 404)
+
+    def test_process_no_params(self):
+        response = self.client.get(self.process_review_url)
+        self.assertEqual(response.status_code, 404)
+
+
+class PendingViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.pending_url = reverse('studyspots:pending')
+        self.pending_studyspace = PendingStudySpace(
+            studyspace_id=1,
+            name='room 1'
+        )
+        self.pending_location = PendingLocation(
+            location_id=1,
+            name='alderman library'
+        )
+
+    def test_pending_valid_id(self):
+        response = self.client.get(self.pending_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'studyspots/pending.html')
+        self.assertIn('pending_studyspaces', response.context)
+        self.assertEqual(self.pending_studyspace.name, 'room 1')
+
+    def test_pending_invalid_id(self):
+        response = self.client.get(self.pending_url, {'studyspot': '-2'})
+        self.assertEqual(response.status_code, 404)
+
+
+class ApprovePendingTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.pending_studyspace = PendingStudySpace(
+            studyspace_id=1,
+            name='room 1'
+        )
+        self.pending_location = PendingLocation(
+            location_id=1,
+            name='alderman library'
+        )
+        self.approve_url = reverse('studyspots:approve_pending')
+
+    def test_approve_success(self):
+        response = self.client.get(self.approve_url, {'studyspot': '1'})
+        self.assertFalse(PendingStudySpace.objects.filter(studyspace_id=self.pending_studyspace.studyspace_id).exists())
+        self.assertFalse(StudySpace.objects.filter(name=self.pending_studyspace.name).exists())
+
+    def test_approve_fail(self):
+        response = self.client.get(self.approve_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('studyspots:pending'))
+
+
+class RejectPendingTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='username', password='password123')
+        login = self.client.login(username='username', password='password123')
+        self.assertEqual(login, True)
+        self.pending_studyspace = PendingStudySpace(
+            studyspace_id=1,
+            name='room 1'
+        )
+        self.pending_location = PendingLocation(
+            location_id=1,
+            name='alderman library'
+        )
+        self.reject_url = reverse('studyspots:reject_pending')
+
+    def test_reject_success(self):
+        response = self.client.get(self.reject_url, {'studyspot': self.pending_studyspace.studyspace_id})
+        self.assertFalse(PendingStudySpace.objects.filter(studyspace_id=self.pending_studyspace.studyspace_id).exists())
+
+    def test_reject_fail(self):
+        response = self.client.get(self.reject_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_reject_pendinglocation_success(self):
+        response = self.client.get(self.reject_url, {'studyspot': self.pending_studyspace.studyspace_id})
+        self.assertFalse(PendingLocation.objects.filter(location_id=self.pending_location.location_id).exists())
+        self.assertFalse(PendingStudySpace.objects.filter(studyspace_id=self.pending_studyspace.studyspace_id).exists())
