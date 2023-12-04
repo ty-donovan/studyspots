@@ -375,6 +375,8 @@ def pending(request):
         return render(request, 'studyspots/pending.html', context)
     pending_studyspace = get_object_or_404(PendingStudySpace, pk=studyspace_id)
     pending_location = None
+    pending_lat = None
+    pending_lng = None
     if pending_studyspace.content_type.model == 'pendinglocation':
         pending_location_id = pending_studyspace.object_id
         pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
