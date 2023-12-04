@@ -190,14 +190,14 @@ def add(request):
 def load(request):
     if settings.DEBUG:
         json_response = {}
-        json_response.update(__load_subprocess(Location, 'locations.json', name="location", id_var_name="location_id"))
-        json_response.update(__load_subprocess(StudySpace, 'studyspaces.json', name="studyspace", id_var_name="studyspace_id"))
+        json_response.update(__load_subprocess_location('locations.json', name="location"))
+        json_response.update(__load_subprocess_studyspace('studyspaces.json', name="studyspace"))
         return JsonResponse(json_response, safe=True)
     else:
         return HttpResponseNotFound()
 
 
-def __load_subprocess_location(filename, name="object", name_plural=None, id_var_name="id"):
+def __load_subprocess_location(filename, name="object", name_plural=None):
     if name_plural is None:
         name_plural = name + "s"
     with open(filename) as json_file:
@@ -209,21 +209,12 @@ def __load_subprocess_location(filename, name="object", name_plural=None, id_var
 
     added_objects = []
     for object_dict in objects:
-        if Location.objects.filter(
-                **{
-                    f'{id_var_name}': int(object_dict[str(id_var_name)])
-                }
-        ).count() == 0:
-            obj = Location()
-            print(object_dict.items())
-            for k, v in object_dict.items():
-                if k != id_var_name:
-                    print(type(k))
-                    setattr(obj, k, v)
-                else:
-                    print(k)
+        if Location.objects.filter(name=object_dict["name"]).count() == 0:
+            obj = Location(name=object_dict['name'], location_type=object_dict['location_type'],
+                           address=object_dict['address'], lat=object_dict['lat'], lng=object_dict['lng'],
+                           on_grounds=object_dict['on_grounds'])
             obj.save()
-            added_objects.append(getattr(obj, id_var_name))
+            added_objects.append(object_dict['location_id'])
     if len(added_objects) == 0:
         json_response = dict({"Warning": f"No {name_plural} added. Already in database"})
     elif len(added_objects) == 1:
@@ -234,7 +225,7 @@ def __load_subprocess_location(filename, name="object", name_plural=None, id_var
     return json_response
 
 
-def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_name="id"):
+def __load_subprocess_studyspace(filename, name="object", name_plural=None):
     if name_plural is None:
         name_plural = name + "s"
     with open(filename) as json_file:
@@ -246,21 +237,22 @@ def __load_subprocess(cls, filename, name="object", name_plural=None, id_var_nam
 
     added_objects = []
     for object_dict in objects:
-        if cls.objects.filter(
-                **{
-                    f'{id_var_name}': int(object_dict[str(id_var_name)])
-                }
-        ).count() == 0:
-            obj = cls()
-            print(object_dict.items())
-            for k, v in object_dict.items():
-                if k != id_var_name:
-                    print(type(k))
-                    setattr(obj, k, v)
-                else:
-                    print(k)
+        if StudySpace.objects.all().filter(name=object_dict["name"]).count() == 0:
+            a = int(object_dict['location_id_id'])
+            location = Location.objects.all().get(location_id__exact=a)
+            if not location:
+                return ""
+            obj = StudySpace(name=object_dict['name'],
+                             location_id=location,
+                             space_type=object_dict['space_type'], capacity=object_dict['capacity'],
+                             link=object_dict['link'], reservable=object_dict['reservable'],
+                             comments=object_dict['comments'], overall_ratings=object_dict['overall_ratings'],
+                             comfort_ratings=object_dict['comfort_ratings'],
+                             crowdedness_ratings=object_dict['crowdedness_ratings'],
+                             noise_level_ratings=object_dict['noise_level_ratings'],
+                             )
             obj.save()
-            added_objects.append(getattr(obj, id_var_name))
+            added_objects.append(object_dict['studyspace_id'])
     if len(added_objects) == 0:
         json_response = dict({"Warning": f"No {name_plural} added. Already in database"})
     elif len(added_objects) == 1:

@@ -16,7 +16,7 @@
     {
         "studyspace_id": 2,
         "name": "Bryan 203",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/bryan-203",
@@ -30,7 +30,7 @@
     {
         "studyspace_id": 3,
         "name": "Bryan 235",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 30,
         "link": "https://classrooms.its.virginia.edu/list/bryan-235",
@@ -44,7 +44,7 @@
     {
         "studyspace_id": 4,
         "name": "Bryan 310",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/bryan-310",
@@ -58,7 +58,7 @@
     {
         "studyspace_id": 5,
         "name": "Bryan 312",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/bryan-312",
@@ -72,7 +72,7 @@
     {
         "studyspace_id": 6,
         "name": "Bryan 328",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 30,
         "link": "https://classrooms.its.virginia.edu/list/bryan-328",
@@ -86,7 +86,7 @@
     {
         "studyspace_id": 7,
         "name": "Bryan 330",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/bryan-330",
@@ -100,7 +100,7 @@
     {
         "studyspace_id": 8,
         "name": "Bryan 332",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/campbell-108",
@@ -114,7 +114,7 @@
     {
         "studyspace_id": 9,
         "name": "Bryan 334",
-        "location_id_id": 46,
+        "location_id_id": 42,
         "space_type": "Classroom",
         "capacity": 18,
         "link": "https://classrooms.its.virginia.edu/list/bryan-334",
@@ -702,7 +702,7 @@
     {
         "studyspace_id": 51,
         "name": "McLeod 1003 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 60,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-1003-nursing",
@@ -716,7 +716,7 @@
     {
         "studyspace_id": 52,
         "name": "McLeod 1004 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 60,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-1004-nursing",
@@ -730,7 +730,7 @@
     {
         "studyspace_id": 53,
         "name": "McLeod 1009 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 14,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-1009-nursing",
@@ -744,7 +744,7 @@
     {
         "studyspace_id": 54,
         "name": "McLeod 1020 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 476,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-1020-nursing",
@@ -758,7 +758,7 @@
     {
         "studyspace_id": 55,
         "name": "McLeod 4072 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 12,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-4072-nursing",
@@ -772,7 +772,7 @@
     {
         "studyspace_id": 56,
         "name": "McLeod 5024 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 8,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-5024-nursing",
@@ -786,7 +786,7 @@
     {
         "studyspace_id": 57,
         "name": "McLeod 5060 (Nursing)",
-        "location_id_id": 45,
+        "location_id_id": 41,
         "space_type": "Classroom",
         "capacity": 30,
         "link": "https://classrooms.its.virginia.edu/list/mcleod-5060-nursing",
@@ -2410,7 +2410,7 @@
     {
         "studyspace_id": 173,
         "name": "Thornton A120",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 93,
         "link": "https://classrooms.its.virginia.edu/list/thornton-a120",
@@ -2424,7 +2424,7 @@
     {
         "studyspace_id": 174,
         "name": "Thornton A207",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 48,
         "link": "https://classrooms.its.virginia.edu/list/thornton-a207",
@@ -2438,7 +2438,7 @@
     {
         "studyspace_id": 175,
         "name": "Thornton D115",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 35,
         "link": "https://classrooms.its.virginia.edu/list/thornton-d115",
@@ -2452,7 +2452,7 @@
     {
         "studyspace_id": 176,
         "name": "Thornton D222",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 36,
         "link": "https://classrooms.its.virginia.edu/list/thornton-d222",
@@ -2466,7 +2466,7 @@
     {
         "studyspace_id": 177,
         "name": "Thornton D223",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 48,
         "link": "https://classrooms.its.virginia.edu/list/thornton-d223",
@@ -2480,7 +2480,7 @@
     {
         "studyspace_id": 178,
         "name": "Thornton E303",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 100,
         "link": "https://classrooms.its.virginia.edu/list/thornton-e303",
@@ -2494,7 +2494,7 @@
     {
         "studyspace_id": 179,
         "name": "Thornton E304",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 48,
         "link": "https://classrooms.its.virginia.edu/list/thornton-e304",
@@ -2508,7 +2508,7 @@
     {
         "studyspace_id": 180,
         "name": "Thornton E316",
-        "location_id_id": 40,
+        "location_id_id": 38,
         "space_type": "Classroom",
         "capacity": 94,
         "link": "https://classrooms.its.virginia.edu/list/thornton-e316",
@@ -2522,7 +2522,7 @@
     {
         "studyspace_id": 181,
         "name": "Warner 104",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 60,
         "link": "https://classrooms.its.virginia.edu/list/warner-104",
@@ -2536,7 +2536,7 @@
     {
         "studyspace_id": 182,
         "name": "Warner 110",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 35,
         "link": "https://classrooms.its.virginia.edu/list/warner-110",
@@ -2550,7 +2550,7 @@
     {
         "studyspace_id": 183,
         "name": "Warner 112",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 15,
         "link": "https://classrooms.its.virginia.edu/list/warner-112",
@@ -2564,7 +2564,7 @@
     {
         "studyspace_id": 184,
         "name": "Warner 113",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 30,
         "link": "https://classrooms.its.virginia.edu/list/warner-113",
@@ -2578,7 +2578,7 @@
     {
         "studyspace_id": 185,
         "name": "Warner 115",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 49,
         "link": "https://classrooms.its.virginia.edu/list/warner-115",
@@ -2592,7 +2592,7 @@
     {
         "studyspace_id": 186,
         "name": "Warner 209",
-        "location_id_id": 42,
+        "location_id_id": 40,
         "space_type": "Classroom",
         "capacity": 294,
         "link": "https://classrooms.its.virginia.edu/list/warner-209",
@@ -2606,7 +2606,7 @@
     {
         "studyspace_id": 187,
         "name": "Wilson 214",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 30,
         "link": "https://classrooms.its.virginia.edu/list/wilson-214",
@@ -2620,7 +2620,7 @@
     {
         "studyspace_id": 188,
         "name": "Wilson 238",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 35,
         "link": "https://classrooms.its.virginia.edu/list/wilson-238",
@@ -2634,7 +2634,7 @@
     {
         "studyspace_id": 189,
         "name": "Wilson 244",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 20,
         "link": "https://classrooms.its.virginia.edu/list/wilson-244",
@@ -2648,7 +2648,7 @@
     {
         "studyspace_id": 190,
         "name": "Wilson 301",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 200,
         "link": "https://classrooms.its.virginia.edu/list/wilson-301",
@@ -2662,7 +2662,7 @@
     {
         "studyspace_id": 191,
         "name": "Wilson 325",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 99,
         "link": "https://classrooms.its.virginia.edu/list/wilson-325",
@@ -2676,7 +2676,7 @@
     {
         "studyspace_id": 192,
         "name": "Wilson 402",
-        "location_id_id": 41,
+        "location_id_id": 39,
         "space_type": "Classroom",
         "capacity": 308,
         "link": "https://classrooms.its.virginia.edu/list/wilson-402",
