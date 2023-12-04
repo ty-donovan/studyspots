@@ -366,6 +366,7 @@ def process_studyspace_review(request):
 @login_required
 def pending(request):
     studyspace_id = get_variable(request, 'studyspot')
+    key = settings.GOOGLE_API_KEY
     if not studyspace_id:
         pending_studyspaces = PendingStudySpace.objects.all()
         context = {
@@ -377,9 +378,14 @@ def pending(request):
     if pending_studyspace.content_type.model == 'pendinglocation':
         pending_location_id = pending_studyspace.object_id
         pending_location = get_object_or_404(PendingLocation, pk=pending_location_id)
+        pending_lat = pending_location.lat
+        pending_lng = pending_location.lng
     context = {
         'pending_studyspace': pending_studyspace,
         'pending_location': pending_location,
+        'pending_lat': pending_lat,
+        'pending_lng': pending_lng,
+        'key': key,
     }
     return render(request, 'studyspots/pendingDetail.html', context)
 
