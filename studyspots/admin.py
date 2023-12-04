@@ -6,6 +6,7 @@ class StudySpaceAdmin(admin.ModelAdmin):
     exclude = (
         'location_ordinal', 'comments', 'overall_ratings', 'comfort_ratings', 'noise_level_ratings',
         'crowdedness_ratings')
+    list_display = ['name', 'get_owner']
 
 
 @admin.register(Admin)

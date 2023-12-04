@@ -160,6 +160,10 @@ class StudySpace(models.Model):
     def calculate_crowdedness_rating(self):
         return calculate_average_rating(self.crowdedness_ratings)
 
+    @property
+    def get_owner(self):
+        return Location.objects.all().get(location_id=self.location_id_id)
+
 
 class StudySpaceSerializer(serializers.ModelSerializer):
     class Meta:
