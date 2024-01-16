@@ -9,18 +9,11 @@ from git import InvalidGitRepositoryError
 try:
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha[:7]
-    with open('studyspots/static/studyspots/git-hash.txt', 'w') as f:
-        f.write(sha)
 except InvalidGitRepositoryError:
-    try:
-        with open('studyspots/static/studyspots/git-hash.txt') as f:
-            sha = f.read()
-    except FileNotFoundError:
-        try:
-            with open('staticfiles/studyspots/git-hash.txt') as f:
-                sha = f.read()
-        except FileNotFoundError:
-            sha = None
+    if 'HEROKU_SLUG_COMMIT' in os.environ:
+        sha = os.environ['HEROKU_SLUG_COMMIT'][:7]
+    else:
+        sha = ""
 
 register = template.Library()
 
