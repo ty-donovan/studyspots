@@ -10,10 +10,13 @@ try:
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha[:7]
 except InvalidGitRepositoryError:
-    if 'HEROKU_SLUG_COMMIT' in os.environ:
-        sha = os.environ['HEROKU_SLUG_COMMIT'][:7]
+    if 'CURRENT_SOURCE' in os.environ:
+        sha = os.environ['CURRENT_SOURCE'][:7]
     else:
-        sha = ""
+        if 'HEROKU_SLUG_COMMIT' in os.environ:
+            sha = os.environ['HEROKU_SLUG_COMMIT'][:7]
+        else:
+            sha = ""
 
 register = template.Library()
 
